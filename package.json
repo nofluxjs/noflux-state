@@ -1,0 +1,38 @@
+{
+  "name": "@noflux/state",
+  "version": "0.0.0",
+  "description": "A state store for noflux",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ava test/ --watch",
+    "build": "babel src --out-dir dist",
+    "test": "ava test/"
+  },
+  "ava": {
+    "babel": "inherit",
+    "require": [
+      "babel-register"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nofluxjs/state.git"
+  },
+  "keywords": [
+    "noflux",
+    "state"
+  ],
+  "author": "i@malash.me",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nofluxjs/state/issues"
+  },
+  "homepage": "https://github.com/nofluxjs/state#readme",
+  "devDependencies": {
+    "ava": "^0.18.2",
+    "babel-cli": "^6.24.0",
+    "babel-preset-es2015": "^6.24.0",
+    "babel-preset-stage-0": "^6.22.0",
+    "babel-register": "^6.24.0"
+  }
+}
