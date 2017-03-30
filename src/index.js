@@ -1,7 +1,4 @@
-export default class State {
-  constructor() {
+import State from './state';
+import Store from './store';
 
-  }
-
-  test = 1
-}
+export { State, Store };
