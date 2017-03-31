@@ -12,7 +12,7 @@ export const normalizePath = (path) => {
 // ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/No_properties
 export const hasNoProperties = obj => obj === undefined || obj === null;
 
-export const getIn = (obj, path) => {
+export const getByPath = (obj, path) => {
   let pointer = obj;
   for (const next of path) {
     if (hasNoProperties(pointer)) {
@@ -39,7 +39,7 @@ export const shallowClone = (obj, path = '') => {
   }
 };
 
-export const setIn = (obj = {}, path, value) => {
+export const setByPath = (obj = {}, path, value) => {
   const [first, ...rest] = path;
 
   let newObj = shallowClone(obj);

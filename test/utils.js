@@ -1,5 +1,5 @@
 import test from 'ava';
-import { normalizePath, hasNoProperties, getIn, setIn } from '../src/utils';
+import { normalizePath, hasNoProperties, getByPath, setByPath } from '../src/utils';
 
 test('normalizePath', t => {
   t.deepEqual(normalizePath(''), []);
@@ -18,7 +18,7 @@ test('hasNoProperties', t => {
   t.is(hasNoProperties(0), false);
 });
 
-test('getIn', t => {
+test('getByPath', t => {
   const obj = {
     a: 1,
     b: {
@@ -28,19 +28,19 @@ test('getIn', t => {
     e: null,
     f: NaN,
   };
-  t.is(getIn(obj, []), obj);
-  t.is(getIn(obj, ['a']), obj.a);
-  t.is(getIn(obj, ['b']), obj.b);
-  t.is(getIn(obj, ['b', 'c']), obj.b.c);
-  t.is(getIn(obj, ['d']), obj.d);
-  t.is(getIn(obj, ['d', '2']), obj.d[2]);
-  t.is(getIn(obj, ['e']), null);
-  t.true(Number.isNaN(getIn(obj, ['f'])));
+  t.is(getByPath(obj, []), obj);
+  t.is(getByPath(obj, ['a']), obj.a);
+  t.is(getByPath(obj, ['b']), obj.b);
+  t.is(getByPath(obj, ['b', 'c']), obj.b.c);
+  t.is(getByPath(obj, ['d']), obj.d);
+  t.is(getByPath(obj, ['d', '2']), obj.d[2]);
+  t.is(getByPath(obj, ['e']), null);
+  t.true(Number.isNaN(getByPath(obj, ['f'])));
 });
 
 const deepClone = x => JSON.parse(JSON.stringify(x));
 
-test('setIn normal', t=> {
+test('setByPath normal', t=> {
   const obj = {
     a: {
       b: {
@@ -55,7 +55,7 @@ test('setIn normal', t=> {
   };
 
   let cloneObj = deepClone(obj);
-  let newObj = setIn(obj, ['a', 'b', 'c'], 2);
+  let newObj = setByPath(obj, ['a', 'b', 'c'], 2);
   t.deepEqual(obj, cloneObj);
 
   cloneObj.a.b.c = 2;
@@ -64,7 +64,7 @@ test('setIn normal', t=> {
 
 });
 
-test('setIn copy-on-write', t=> {
+test('setByPath copy-on-write', t=> {
   const obj = {
     a: {
       b: {
@@ -79,7 +79,7 @@ test('setIn copy-on-write', t=> {
   };
 
   let cloneObj = deepClone(obj);
-  let newObj = setIn(obj, ['a', 'b'], 2);
+  let newObj = setByPath(obj, ['a', 'b'], 2);
   t.deepEqual(obj, cloneObj);
 
   cloneObj.a.b = 2;
@@ -89,11 +89,11 @@ test('setIn copy-on-write', t=> {
 
 });
 
-test('setIn Array', t=> {
+test('setByPath Array', t=> {
   const obj = [0, 1, { a: 2, b: { c: 3} }, { d: 4} ];
 
   let cloneObj = deepClone(obj);
-  let newObj = setIn(obj, ['2', 'b', 'c'], 3);
+  let newObj = setByPath(obj, ['2', 'b', 'c'], 3);
   t.deepEqual(obj, cloneObj);
 
   cloneObj[2].b.c = 3;
@@ -101,13 +101,13 @@ test('setIn Array', t=> {
   t.is(obj[3], newObj[3]);
 });
 
-test('setIn auto detect by path', t=> {
+test('setByPath auto detect by path', t=> {
   const obj = {
     a: 1,
   };
 
   let cloneObj = deepClone(obj);
-  let newObj = setIn(obj, ['b', '2', 'c'], 3);
+  let newObj = setByPath(obj, ['b', '2', 'c'], 3);
   t.deepEqual(obj, cloneObj);
 
   cloneObj.b = [undefined, undefined, { c: 3 }];

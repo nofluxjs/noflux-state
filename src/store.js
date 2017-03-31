@@ -1,4 +1,4 @@
-import { getIn } from './utils';
+import { getByPath } from './utils';
 
 export default class Store {
 
@@ -7,7 +7,7 @@ export default class Store {
   }
 
   read(path) {
-    return getIn(this._data, path);
+    return getByPath(this._data, path);
   }
 
   write(path, value) {
