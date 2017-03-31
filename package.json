@@ -4,9 +4,9 @@
   "description": "A state store for noflux",
   "main": "index.js",
   "scripts": {
-    "dev": "ava test/ --watch",
+    "dev": "ava test/ --watch --verbose",
     "build": "babel src --out-dir dist",
-    "test": "ava test/"
+    "test": "ava test/ --verbose"
   },
   "ava": {
     "babel": "inherit",
