@@ -101,6 +101,18 @@ test('setByPath Array', t=> {
   t.is(obj[3], newObj[3]);
 });
 
+test('setByPath bad state', t=> {
+  const path = ['a', 'b', 'c'];
+  const value = 1;
+  const result = { a: { b: { c: 1 } } };
+  t.deepEqual(setByPath(null, path , value), result);
+  t.deepEqual(setByPath(undefined, path , value), result);
+  t.deepEqual(setByPath(1, path , value), result);
+  t.deepEqual(setByPath('2', path , value), result);
+  t.deepEqual(setByPath(function f() {}, path , value), result);
+  t.deepEqual(setByPath(Symbol('foo'), path , value), result);
+});
+
 test('setByPath auto detect by path', t=> {
   const obj = {
     a: 1,

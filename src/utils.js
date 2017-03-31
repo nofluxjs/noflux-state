@@ -45,7 +45,7 @@ export const setByPath = (obj = {}, path, value) => {
   let newObj = shallowClone(obj);
   let parentPointer = newObj;
   let lastNext = first;
-  let pointer = obj[first];
+  let pointer = hasNoProperties(obj) ? null : obj[first];
 
   for (const next of rest) {
     parentPointer[lastNext] = shallowClone(pointer, next);
