@@ -1,5 +1,6 @@
 import test from 'ava';
 import { normalizePath, hasNoProperties, getByPath, setByPath } from '../src/utils';
+const deepClone = x => JSON.parse(JSON.stringify(x));
 
 test('normalizePath', t => {
   t.deepEqual(normalizePath(''), []);
@@ -38,8 +39,6 @@ test('getByPath', t => {
   t.true(Number.isNaN(getByPath(obj, ['f'])));
 });
 
-const deepClone = x => JSON.parse(JSON.stringify(x));
-
 test('setByPath normal', t=> {
   const obj = {
     a: {
@@ -69,7 +68,7 @@ test('setByPath copy-on-write', t=> {
     a: {
       b: {
         d: 1,
-        e: 2
+        e: 2,
       },
       c: {
         f: 3,

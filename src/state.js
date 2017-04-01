@@ -17,13 +17,12 @@ export default class State {
     });
   }
 
-  get(subPath) {
+  get(subPath = '') {
     const { length } = arguments;
-    if (length === 0) {
-      return this._store.read(this._cursor);
-    } else {
+    if (length !== 0) {
       return this.cursor(subPath).get();
     }
+    return this._store.read(this._cursor);
   }
 
   set(subPath, value) {
@@ -35,10 +34,9 @@ export default class State {
       value = subPath;
       subPath = undefined;
     }
-    if (subPath === undefined) {
-      return this._store.write(this._cursor, value);
-    } else {
+    if (subPath !== undefined) {
       return this.cursor(subPath).set(value);
     }
+    this._store.write(this._cursor, value);
   }
 }

@@ -1,9 +1,9 @@
-import { getByPath } from './utils';
+import { getByPath, setByPath } from './utils';
 
 export default class Store {
 
-  constructor() {
-    this._data = undefined;
+  constructor(data) {
+    this._data = data;
   }
 
   read(path) {
@@ -11,6 +11,6 @@ export default class Store {
   }
 
   write(path, value) {
-    return;
+    this._data = setByPath(this._data, path, value);
   }
 }

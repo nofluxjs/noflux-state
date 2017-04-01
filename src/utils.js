@@ -39,7 +39,10 @@ export const shallowClone = (obj, path = '') => {
   }
 };
 
-export const setByPath = (obj = {}, path, value) => {
+export const setByPath = (obj = {}, path = [], value) => {
+  if (!path.length) {
+    return value;
+  }
   const [first, ...rest] = path;
 
   let newObj = shallowClone(obj);
