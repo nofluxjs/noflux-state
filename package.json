@@ -2,7 +2,7 @@
   "name": "@noflux/state",
   "version": "0.0.0",
   "description": "A state store for noflux",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "dev": "ava test/ --watch --verbose",
     "build": "babel src --out-dir dist",
