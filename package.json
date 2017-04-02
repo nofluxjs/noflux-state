@@ -4,10 +4,13 @@
   "description": "A state store for noflux",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "ava test/ --watch --verbose",
     "lint": "eslint src/ test/",
-    "build": "babel src --out-dir dist",
-    "test": "npm run lint && ava test/ --verbose"
+    "lint:watch": "esw src/ test/ -w",
+    "ava": "ava test/ --verbose",
+    "ava:watch": "ava test/ --watch --verbose",
+    "dev": "concurrently -p \"[{name}]\" -n \"lint,ava\" \"npm run lint:watch\" \"npm run ava:watch\"",
+    "test": "npm run lint && npm run ava",
+    "build": "babel src --out-dir dist"
   },
   "ava": {
     "babel": "inherit",
@@ -35,8 +38,10 @@
     "babel-preset-es2015": "^6.24.0",
     "babel-preset-stage-0": "^6.22.0",
     "babel-register": "^6.24.0",
+    "concurrently": "^3.4.0",
     "eslint": "^3.19.0",
     "eslint-config-airbnb-base": "^11.1.2",
-    "eslint-plugin-import": "^2.2.0"
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-watch": "^3.0.1"
   }
 }
