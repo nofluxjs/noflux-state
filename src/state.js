@@ -3,17 +3,17 @@ import { normalizePath } from './utils';
 
 export default class State {
 
-  constructor({ _store = new Store(), _cursor = [] } = {}) {
-    this._store = _store;
-    this._cursor = _cursor;
+  constructor({ store = new Store(), cursor = [] } = {}) {
+    this.__store = store;
+    this.__cursor = cursor;
   }
 
   cursor(subPath = '') {
-    const { _store, _cursor } = this;
+    const { __store, __cursor } = this;
     subPath = normalizePath(subPath);
     return new State({
-      _store,
-      _cursor: _cursor.concat(subPath)
+      store: __store,
+      cursor: __cursor.concat(subPath),
     });
   }
 
@@ -22,7 +22,7 @@ export default class State {
     if (length !== 0) {
       return this.cursor(subPath).get();
     }
-    return this._store.read(this._cursor);
+    return this.__store.read(this.__cursor);
   }
 
   set(subPath, value) {
@@ -37,6 +37,6 @@ export default class State {
     if (subPath !== undefined) {
       return this.cursor(subPath).set(value);
     }
-    this._store.write(this._cursor, value);
+    this.__store.write(this.__cursor, value);
   }
 }

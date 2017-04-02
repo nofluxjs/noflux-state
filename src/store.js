@@ -3,14 +3,14 @@ import { getByPath, setByPath } from './utils';
 export default class Store {
 
   constructor(data) {
-    this._data = data;
+    this.__data = data;
   }
 
   read(path) {
-    return getByPath(this._data, path);
+    return getByPath(this.__data, path);
   }
 
   write(path, value) {
-    this._data = setByPath(this._data, path, value);
+    this.__data = setByPath(this.__data, path, value);
   }
 }

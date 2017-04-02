@@ -1,5 +1,6 @@
 import test from 'ava';
 import Store from '../src/store';
+
 const deepClone = x => JSON.parse(JSON.stringify(x));
 
 test('read', t => {
@@ -7,7 +8,7 @@ test('read', t => {
     a: {
       b: [{
         c: 1,
-      }]
+      }],
     },
     d: null,
     e: undefined,
@@ -34,7 +35,7 @@ test('write', t => {
       c: {
         f: 3,
         g: 4,
-      }
+      },
     },
   };
   const store = new Store(data1);

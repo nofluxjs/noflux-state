@@ -1,12 +1,11 @@
-export const normalizePath = (path) => {
+export const normalizePath = path => {
   if (Array.isArray(path)) {
     return path;
   } else if (typeof path === 'string') {
     return path.split('.').filter(subPath => subPath.length);
-  } else {
-    throw Error(`State.prototype.cursor only accept string or array, ${typeof path} is forbidden`);
   }
-}
+  throw Error(`State.prototype.cursor only accept string or array, ${typeof path} is forbidden`);
+};
 
 // only null and undefined has no properties
 // ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/No_properties
@@ -21,7 +20,7 @@ export const getByPath = (obj, path) => {
     pointer = pointer[next];
   }
   return pointer;
-}
+};
 
 export const isObject = obj => typeof obj === 'object' && obj !== null;
 export const isNumeric = num => !isNaN(num) && num !== '';
@@ -30,7 +29,7 @@ export const shallowClone = (obj, path = '') => {
   if (Array.isArray(obj)) {
     return [...obj];
   } else if (isObject(obj)) {
-    return {...obj};
+    return { ...obj };
   }
   if (isNumeric(path)) {
     return [];
@@ -45,7 +44,7 @@ export const setByPath = (obj = {}, path = [], value) => {
   }
   const [first, ...rest] = path;
 
-  let newObj = shallowClone(obj);
+  const newObj = shallowClone(obj);
   let parentPointer = newObj;
   let lastNext = first;
   let pointer = hasNoProperties(obj) ? null : obj[first];
@@ -57,7 +56,6 @@ export const setByPath = (obj = {}, path = [], value) => {
     if (hasNoProperties(pointer)) {
       // always skip traversing null or undefined
       pointer = null;
-      continue;
     } else {
       pointer = pointer[next];
     }

@@ -3,11 +3,11 @@ import State from '../src/state';
 
 test('get and set', t => {
   const state = new State();
-  state.set('a.b', { c: { d: 1 } } );
+  state.set('a.b', { c: { d: 1 } });
 
-  t.deepEqual(state.get(), { a: { b : { c: { d: 1 } } } });
-  t.deepEqual(state.get(''), { a: { b : { c: { d: 1 } } } });
-  t.deepEqual(state.get('a'), { b : { c: { d: 1 } } });
+  t.deepEqual(state.get(), { a: { b: { c: { d: 1 } } } });
+  t.deepEqual(state.get(''), { a: { b: { c: { d: 1 } } } });
+  t.deepEqual(state.get('a'), { b: { c: { d: 1 } } });
   t.deepEqual(state.get('a.b'), { c: { d: 1 } });
   t.deepEqual(state.get('a.b.c'), { d: 1 });
   t.deepEqual(state.get('a.b.c.d'), 1);
@@ -25,8 +25,8 @@ test('cursor get', t => {
     a: {
       b: {
         c: 1,
-      }
-    }
+      },
+    },
   });
   t.is(state.cursor().get(), state.get());
   t.is(state.cursor('a').get(), state.get('a'));
