@@ -3,6 +3,7 @@
     "plugins": [
         "import"
     ],
+    "parser": "babel-eslint",
     "rules": {
         "arrow-parens": ["error", "as-needed", { "requireForBlockBody": false }],
         "consistent-return": ["off"],
