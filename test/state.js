@@ -70,9 +70,9 @@ test('event emit with cursor', t => {
     // should emit
     state.set('', 1);
     state.set('a', 1);
+    state.set('a.b', 1);
     state.cursor('a').set('c', 1);
     // should not emit
-    state.set('a.b', 1);
     state.set('c.d', 1);
   });
   return Observable
