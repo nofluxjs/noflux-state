@@ -54,7 +54,6 @@ test('event emit', t => {
     state.set('', 1);
     state.set('a', 1);
     state.set('a.b', 1);
-    // should not emit
     state.set('c.d', 1);
   });
   return Observable
