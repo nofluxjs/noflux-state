@@ -55,10 +55,6 @@ export default class State {
     this.__emitter.emit(['change', ...this.__cursor, '**'].join('.'), value);
   }
 
-  currentCursor() {
-    return this.__cursor.join('.');
-  }
-
   listen(message) {
     let generatedMessage;
     switch (message) {
