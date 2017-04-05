@@ -52,7 +52,7 @@ export default class State {
       return this.cursor(subPath).set(value);
     }
     this.__store.write(this.__cursor, value);
-    this.__emitter.emit(['change', ...this.__cursor], value);
+    this.__emitter.emit(['change', ...this.__cursor, '**'].join('.'), value);
   }
 
   currentCursor() {
