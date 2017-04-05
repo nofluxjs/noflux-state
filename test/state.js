@@ -50,9 +50,11 @@ test('event emit', t => {
   t.plan(4);
   const state = new State();
   process.nextTick(() => {
+    // should emit
     state.set('', 1);
     state.set('a', 1);
     state.set('a.b', 1);
+    // should not emit
     state.set('c.d', 1);
   });
   return Observable
@@ -62,11 +64,14 @@ test('event emit', t => {
 });
 
 test('event emit with cursor', t => {
-  t.plan(3);
+  t.plan(4);
   const state = new State();
   process.nextTick(() => {
+    // should emit
     state.set('', 1);
     state.set('a', 1);
+    state.cursor('a').set('c', 1);
+    // should not emit
     state.set('a.b', 1);
     state.set('c.d', 1);
   });
