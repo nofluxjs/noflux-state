@@ -13,7 +13,8 @@ export const hasNoProperties = obj => obj === undefined || obj === null;
 
 export const getByPath = (obj, path) => {
   let pointer = obj;
-  for (const next of path) {
+  for (let i = 0; i < path.length; i++) {
+    const next = path[i];
     if (hasNoProperties(pointer)) {
       return undefined;
     }
@@ -49,7 +50,8 @@ export const setByPath = (obj = {}, path = [], value) => {
   let lastNext = first;
   let pointer = hasNoProperties(obj) ? null : obj[first];
 
-  for (const next of rest) {
+  for (let i = 0; i < rest.length; i++) {
+    const next = rest[i];
     parentPointer[lastNext] = shallowClone(pointer, next);
     parentPointer = parentPointer[lastNext];
     lastNext = next;
