@@ -11,6 +11,7 @@
         "no-else-return": ["off"],
         "no-param-reassign": ["off"],
         "no-restricted-syntax": ["off"],
-        "no-underscore-dangle": ["off", { "allowAfterThis": true, "allowAfterSuper": true }]
+        "no-underscore-dangle": ["off", { "allowAfterThis": true, "allowAfterSuper": true }],
+        "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }]
     }
 }
