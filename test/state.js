@@ -79,3 +79,41 @@ test('event emit with cursor', t => {
     .map(() => t.pass())
     .timeoutWith(OBSERVABLE_TIMEOUT, Observable.empty());
 });
+
+test('set path with dot', t => {
+  t.plan(5);
+  const state = new State();
+  process.nextTick(() => {
+    // should emit
+    state.set('', 1);
+    state.set('a', 1);
+    state.set('a.b', 1);
+    state.cursor('a').set('c', 1);
+    state.set(['a', 'b.c'], 1);
+    // should not emit
+    state.set(['a.d'], 1);
+    state.set(['a.e', 'f'], 1);
+  });
+  return Observable
+    .from(state.cursor('a').listen('change'))
+    .map(() => t.pass())
+    .timeoutWith(OBSERVABLE_TIMEOUT, Observable.empty());
+});
+
+test('listen path with dot', t => {
+  t.plan(3);
+  const state = new State();
+  process.nextTick(() => {
+    // should emit
+    state.set('', 1);
+    state.set(['a.b'], 1);
+    state.set(['a.b', 'c'], 1);
+    // should not emit
+    state.set('a', 1);
+    state.set('a.b', 1);
+  });
+  return Observable
+    .from(state.cursor(['a.b']).listen('change'))
+    .map(() => t.pass())
+    .timeoutWith(OBSERVABLE_TIMEOUT, Observable.empty());
+});

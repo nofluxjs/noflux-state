@@ -21,7 +21,7 @@ export default class State {
     this.__emitter = emitter;
   }
 
-  cursor(subPath = '') {
+  cursor(subPath = []) {
     const { __store, __cursor, __emitter } = this;
     subPath = normalizePath(subPath);
     return new State({
@@ -31,7 +31,7 @@ export default class State {
     });
   }
 
-  get(subPath = '') {
+  get(subPath = []) {
     const { length } = arguments;
     if (length !== 0) {
       return this.cursor(subPath).get();
@@ -52,14 +52,14 @@ export default class State {
       return this.cursor(subPath).set(value);
     }
     this.__store.write(this.__cursor, value);
-    this.__emitter.emit(['change', ...this.__cursor, '**'].join('.'), value);
+    this.__emitter.emit(['change', ...this.__cursor, '**'], value);
   }
 
   listen(message) {
     let generatedMessage;
     switch (message) {
       case 'change':
-        generatedMessage = ['change', ...this.__cursor, '**'].join('.');
+        generatedMessage = ['change', ...this.__cursor, '**'];
         break;
       default:
         generatedMessage = message;
