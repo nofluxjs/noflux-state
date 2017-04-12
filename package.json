@@ -1,6 +1,6 @@
 {
   "name": "@noflux/state",
-  "version": "0.2",
+  "version": "0.2.0",
   "description": "A state store for noflux",
   "main": "dist/index.js",
   "scripts": {
