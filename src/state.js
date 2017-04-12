@@ -45,14 +45,16 @@ export default class State {
       throw new TypeError('value argument must be set');
     }
     if (length === 1) {
-      value = subPath;
-      subPath = undefined;
+      [subPath, value] = [undefined, subPath];
     }
     if (subPath !== undefined) {
       return this.cursor(subPath).set(value);
     }
     this.__store.write(this.__cursor, value);
-    this.__emitter.emit(['change', ...this.__cursor, '**'], value);
+    this.__emitter.emit(['change', ...this.__cursor, '**'], {
+      path: this.__cursor.join('.'),
+      value,
+    });
   }
 
   listen(message) {
