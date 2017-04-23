@@ -1,6 +1,4 @@
 import { EventEmitter2 } from 'eventemitter2';
-import { Observable } from 'rxjs/Observable';
-import { fromEvent } from 'rxjs/observable/fromEvent';
 import Store from './store';
 import { normalizePath } from './utils';
 
@@ -57,16 +55,31 @@ export default class State {
     });
   }
 
-  listen(message) {
-    let generatedMessage;
+  __generateEventMessage(message) {
     switch (message) {
       case 'change':
-        generatedMessage = ['change', ...this.__cursor, '**'];
-        break;
+        return ['change', ...this.__cursor, '**'];
       default:
-        generatedMessage = message;
-        break;
+        return message;
     }
-    return Observable::fromEvent(this.__emitter, generatedMessage);
+  }
+
+  on(message, callback) {
+    const generatedMessage = this.__generateEventMessage(message);
+    this.__emitter.on(generatedMessage, callback);
+    // return cleanup handler
+    return () => {
+      this.__emitter.off(generatedMessage, callback);
+    };
+  }
+  addEventListener(message, callback) {
+    return this.on(message, callback);
+  }
+  off(message, callback) {
+    const generatedMessage = this.__generateEventMessage(message);
+    this.__emitter.off(generatedMessage, callback);
+  }
+  removeEventListener(message, callback) {
+    return this.off(message, callback);
   }
 }

@@ -57,7 +57,7 @@ test('event emit', t => {
     state.set('c.d', 1);
   });
   return Observable
-    .from(state.listen('change'))
+    .fromEvent(state, 'change')
     .map(() => t.pass())
     .timeoutWith(OBSERVABLE_TIMEOUT, Observable.empty());
 });
@@ -75,7 +75,7 @@ test('event emit with cursor', t => {
     state.set('c.d', 1);
   });
   return Observable
-    .from(state.cursor('a').listen('change'))
+    .fromEvent(state.cursor('a'), 'change')
     .map(() => t.pass())
     .timeoutWith(OBSERVABLE_TIMEOUT, Observable.empty());
 });
@@ -95,7 +95,7 @@ test('set path with dot', t => {
     state.set(['a.e', 'f'], 1);
   });
   return Observable
-    .from(state.cursor('a').listen('change'))
+    .fromEvent(state.cursor('a'), 'change')
     .map(() => t.pass())
     .timeoutWith(OBSERVABLE_TIMEOUT, Observable.empty());
 });
@@ -113,7 +113,7 @@ test('listen path with dot', t => {
     state.set('a.b', 1);
   });
   return Observable
-    .from(state.cursor(['a.b']).listen('change'))
+    .fromEvent(state.cursor(['a.b']), 'change')
     .map(() => t.pass())
     .timeoutWith(OBSERVABLE_TIMEOUT, Observable.empty());
 });
