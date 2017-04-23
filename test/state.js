@@ -1,8 +1,7 @@
 import test from 'ava';
-import { Observable } from 'rxjs/Rx';
 import State from '../src/state';
 
-const OBSERVABLE_TIMEOUT = 100;
+const TEST_TIMEOUT = 100;
 
 test('get and set', t => {
   const state = new State();
@@ -46,74 +45,69 @@ test('cursor set', t => {
   t.deepEqual(state.get(), { a: { b: { c: { d: 1, e: 2 } } } });
 });
 
-test('event emit', t => {
+test.cb('event emit', t => {
   t.plan(4);
   const state = new State();
-  process.nextTick(() => {
-    // should emit
-    state.set('', 1);
-    state.set('a', 1);
-    state.set('a.b', 1);
-    state.set('c.d', 1);
-  });
-  return Observable
-    .fromEvent(state, 'change')
-    .map(() => t.pass())
-    .timeoutWith(OBSERVABLE_TIMEOUT, Observable.empty());
+  const handler = state.on('change', () => t.pass());
+  // should emit
+  state.set('', 1);
+  state.set('a', 1);
+  state.set('a.b', 1);
+  state.set('c.d', 1);
+  // remove listener
+  handler();
+  state.set('', 1);
+  setTimeout(() => {
+    t.end();
+  }, TEST_TIMEOUT);
 });
 
-test('event emit with cursor', t => {
+test.cb('event emit with cursor', t => {
   t.plan(4);
   const state = new State();
-  process.nextTick(() => {
-    // should emit
-    state.set('', 1);
-    state.set('a', 1);
-    state.set('a.b', 1);
-    state.cursor('a').set('c', 1);
-    // should not emit
-    state.set('c.d', 1);
-  });
-  return Observable
-    .fromEvent(state.cursor('a'), 'change')
-    .map(() => t.pass())
-    .timeoutWith(OBSERVABLE_TIMEOUT, Observable.empty());
+  state.cursor('a').on('change', () => t.pass());
+  // should emit
+  state.set('', 1);
+  state.set('a', 1);
+  state.set('a.b', 1);
+  state.cursor('a').set('c', 1);
+  // should not emit
+  state.set('c.d', 1);
+  setTimeout(() => {
+    t.end();
+  }, TEST_TIMEOUT);
 });
 
-test('set path with dot', t => {
+test.cb('set path with dot', t => {
   t.plan(5);
   const state = new State();
-  process.nextTick(() => {
-    // should emit
-    state.set('', 1);
-    state.set('a', 1);
-    state.set('a.b', 1);
-    state.cursor('a').set('c', 1);
-    state.set(['a', 'b.c'], 1);
-    // should not emit
-    state.set(['a.d'], 1);
-    state.set(['a.e', 'f'], 1);
-  });
-  return Observable
-    .fromEvent(state.cursor('a'), 'change')
-    .map(() => t.pass())
-    .timeoutWith(OBSERVABLE_TIMEOUT, Observable.empty());
+  state.cursor('a').on('change', () => t.pass());
+  // should emit
+  state.set('', 1);
+  state.set('a', 1);
+  state.set('a.b', 1);
+  state.cursor('a').set('c', 1);
+  state.set(['a', 'b.c'], 1);
+  // should not emit
+  state.set(['a.d'], 1);
+  state.set(['a.e', 'f'], 1);
+  setTimeout(() => {
+    t.end();
+  }, TEST_TIMEOUT);
 });
 
-test('listen path with dot', t => {
+test.cb('listen path with dot', t => {
   t.plan(3);
   const state = new State();
-  process.nextTick(() => {
-    // should emit
-    state.set('', 1);
-    state.set(['a.b'], 1);
-    state.set(['a.b', 'c'], 1);
-    // should not emit
-    state.set('a', 1);
-    state.set('a.b', 1);
-  });
-  return Observable
-    .fromEvent(state.cursor(['a.b']), 'change')
-    .map(() => t.pass())
-    .timeoutWith(OBSERVABLE_TIMEOUT, Observable.empty());
+  state.cursor(['a.b']).on('change', () => t.pass());
+  // should emit
+  state.set('', 1);
+  state.set(['a.b'], 1);
+  state.set(['a.b', 'c'], 1);
+  // should not emit
+  state.set('a', 1);
+  state.set('a.b', 1);
+  setTimeout(() => {
+    t.end();
+  }, TEST_TIMEOUT);
 });
