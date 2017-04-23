@@ -48,7 +48,6 @@
     "eslint-watch": "^3.0.1"
   },
   "dependencies": {
-    "eventemitter2": "^4.1.0",
-    "rxjs": "^5.3.0"
+    "eventemitter2": "^4.1.0"
   }
 }
