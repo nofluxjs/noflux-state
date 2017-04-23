@@ -14,7 +14,7 @@ test('read', t => {
     e: undefined,
     f: NaN,
   };
-  const store = new Store(data);
+  const store = new Store({ data });
   t.deepEqual(store.read([]), data);
   t.deepEqual(store.read(['a']), data.a);
   t.deepEqual(store.read(['a', 'b']), data.a.b);
@@ -38,7 +38,7 @@ test('write', t => {
       },
     },
   };
-  const store = new Store(data1);
+  const store = new Store({ data: data1 });
   const result1 = store.read([]);
   t.is(result1, data1);
 
@@ -59,4 +59,77 @@ test('write empty', t => {
   const data = { a: 1 };
   store.write([], data);
   t.deepEqual(store.read([]), data);
+});
+
+test('can redo/undo', t => {
+  const store = new Store();
+  t.is(store.canUndo(), false);
+  t.is(store.canRedo(), false);
+  t.throws(() => store.redo());
+  t.throws(() => store.undo());
+
+  store.snapshot();
+  t.is(store.canUndo(), false);
+  t.is(store.canRedo(), false);
+  t.throws(() => store.redo());
+
+  store.snapshot();
+  t.is(store.canUndo(), true);
+  t.is(store.canRedo(), false);
+  t.throws(() => store.redo());
+
+  store.undo();
+  t.is(store.canUndo(), false);
+  t.is(store.canRedo(), true);
+
+  store.redo();
+});
+
+test('snapshot data', t => {
+  const store = new Store({});
+
+  store.write(['a', 'b', 'c'], 1);
+  const data1 = store.read([]);
+  store.snapshot();
+
+  store.write(['a', 'd', 'e'], 2);
+  const data2 = store.read([]);
+  store.snapshot();
+
+  // won't be snapshotted
+  store.write(['a', 'f', 'g'], 3);
+
+  // undo(data1)
+  t.is(store.canUndo(), true);
+  store.undo();
+  t.is(store.read([]), data1);
+
+  t.is(store.canUndo(), false);
+
+  // redo(data2)
+  t.is(store.canRedo(), true);
+  store.redo();
+  t.is(store.read([]), data2);
+
+  t.is(store.canRedo(), false);
+});
+
+test('maxSnapshots', t => {
+  const MAX_SNAPSHOTS = 10;
+  const store = new Store({
+    data: 0,
+    maxSnapshots: MAX_SNAPSHOTS,
+  });
+  for (let i = 1; i <= MAX_SNAPSHOTS; i++) {
+    store.write([], i);
+    store.snapshot();
+  }
+  store.write([], MAX_SNAPSHOTS + 1);
+  store.snapshot();
+  for (let i = MAX_SNAPSHOTS; i >= 1; i--) {
+    store.undo();
+    t.is(store.read([]), i);
+  }
+  t.is(store.canUndo(), false);
+  t.throws(() => store.undo());
 });
