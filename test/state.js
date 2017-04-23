@@ -45,7 +45,7 @@ test('cursor set', t => {
   t.deepEqual(state.get(), { a: { b: { c: { d: 1, e: 2 } } } });
 });
 
-test.cb('event emit', t => {
+test.cb('event listen and cancel', t => {
   t.plan(4);
   const state = new State();
   const handler = state.on('change', () => t.pass());
@@ -56,6 +56,24 @@ test.cb('event emit', t => {
   state.set('c.d', 1);
   // remove listener
   handler();
+  state.set('', 1);
+  setTimeout(() => {
+    t.end();
+  }, TEST_TIMEOUT);
+});
+
+test.cb('event listen and off', t => {
+  t.plan(4);
+  const state = new State();
+  const callback = () => t.pass();
+  state.on('change', callback);
+  // should emit
+  state.set('', 1);
+  state.set('a', 1);
+  state.set('a.b', 1);
+  state.set('c.d', 1);
+  // remove listener
+  state.off('change', callback);
   state.set('', 1);
   setTimeout(() => {
     t.end();
