@@ -129,3 +129,25 @@ test.cb('listen path with dot', t => {
     t.end();
   }, TEST_TIMEOUT);
 });
+
+test('immutable Array operators', t => {
+  const state = new State();
+  state.set({
+    array: [1, 2, 3],
+  });
+  t.deepEqual(state.get('array'), [1, 2, 3]);
+  state.push('array', 4, 5);
+  t.deepEqual(state.get('array'), [1, 2, 3, 4, 5]);
+  state.pop('array');
+  t.deepEqual(state.get('array'), [1, 2, 3, 4]);
+  state.unshift('array', -1, 0);
+  t.deepEqual(state.get('array'), [-1, 0, 1, 2, 3, 4]);
+  state.shift('array');
+  t.deepEqual(state.get('array'), [0, 1, 2, 3, 4]);
+  state.reverse('array');
+  t.deepEqual(state.get('array'), [4, 3, 2, 1, 0]);
+  state.splice('array', 2, 1, 'a');
+  t.deepEqual(state.get('array'), [4, 3, 'a', 1, 0]);
+  state.fill('array', 0);
+  t.deepEqual(state.get('array'), [0, 0, 0, 0, 0]);
+});

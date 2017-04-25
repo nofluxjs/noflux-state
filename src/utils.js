@@ -7,15 +7,15 @@ export const normalizePath = path => {
   throw Error(`State.prototype.cursor only accept string or array, ${typeof path} is forbidden`);
 };
 
-// only null and undefined has no properties
-// ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/No_properties
-export const hasNoProperties = obj => obj === undefined || obj === null;
+export const isNullOrUndefined = obj => obj === undefined || obj === null;
 
 export const getByPath = (obj, path) => {
   let pointer = obj;
   for (let i = 0; i < path.length; i++) {
     const next = path[i];
-    if (hasNoProperties(pointer)) {
+    // only null and undefined has no properties
+    // ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/No_properties
+    if (isNullOrUndefined(pointer)) {
       return undefined;
     }
     pointer = pointer[next];
@@ -48,14 +48,14 @@ export const setByPath = (obj = {}, path = [], value) => {
   const newObj = shallowClone(obj);
   let parentPointer = newObj;
   let lastNext = first;
-  let pointer = hasNoProperties(obj) ? null : obj[first];
+  let pointer = isNullOrUndefined(obj) ? null : obj[first];
 
   for (let i = 0; i < rest.length; i++) {
     const next = rest[i];
     parentPointer[lastNext] = shallowClone(pointer, next);
     parentPointer = parentPointer[lastNext];
     lastNext = next;
-    if (hasNoProperties(pointer)) {
+    if (isNullOrUndefined(pointer)) {
       // always skip traversing null or undefined
       pointer = null;
     } else {
@@ -65,3 +65,9 @@ export const setByPath = (obj = {}, path = [], value) => {
   parentPointer[lastNext] = value;
   return newObj;
 };
+
+// null or undefined will cause an error
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from
+export const arrayFromAllowNullOrUndefined = arrayLike => (
+  isNullOrUndefined(arrayLike) ? [] : [...arrayLike]
+);

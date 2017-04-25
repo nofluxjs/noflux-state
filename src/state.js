@@ -1,6 +1,6 @@
 import { EventEmitter2 } from 'eventemitter2';
 import Store from './store';
-import { normalizePath } from './utils';
+import { normalizePath, arrayFromAllowNullOrUndefined } from './utils';
 
 export default class State {
 
@@ -81,5 +81,41 @@ export default class State {
   }
   removeEventListener(message, callback) {
     return this.off(message, callback);
+  }
+
+  // immutable Array operators
+  __arrayOperator(subPath, operator, values) {
+    const cursor = this.cursor(subPath);
+    const array = arrayFromAllowNullOrUndefined(cursor.get());
+    Array.prototype[operator].apply(array, values);
+    cursor.set(array);
+  }
+
+  push(subPath, ...values) {
+    this.__arrayOperator(subPath, 'push', values);
+  }
+
+  pop(subPath) {
+    this.__arrayOperator(subPath, 'pop');
+  }
+
+  unshift(subPath, ...values) {
+    this.__arrayOperator(subPath, 'unshift', values);
+  }
+
+  shift(subPath) {
+    this.__arrayOperator(subPath, 'shift');
+  }
+
+  fill(subPath, value) {
+    this.__arrayOperator(subPath, 'fill', [value]);
+  }
+
+  reverse(subPath) {
+    this.__arrayOperator(subPath, 'reverse');
+  }
+
+  splice(subPath, ...values) {
+    this.__arrayOperator(subPath, 'splice', values);
   }
 }
