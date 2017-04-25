@@ -82,4 +82,20 @@ export default class State {
   removeEventListener(message, callback) {
     return this.off(message, callback);
   }
+
+  snapshot() {
+    return this.__store.snapshot();
+  }
+  canUndo() {
+    return this.__store.canUndo();
+  }
+  undo() {
+    return this.__store.undo();
+  }
+  canRedo() {
+    return this.__store.canRedo();
+  }
+  redo() {
+    return this.__store.redo();
+  }
 }
