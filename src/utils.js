@@ -71,3 +71,5 @@ export const setByPath = (obj, path = [], value) => {
 export const arrayFromAllowNullOrUndefined = arrayLike => (
   isNullOrUndefined(arrayLike) ? [] : [...arrayLike]
 );
+
+export const getRandomId = () => Math.random().toString(16).slice(2);
