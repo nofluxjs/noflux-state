@@ -1,5 +1,11 @@
 import test from 'ava';
-import { normalizePath, hasNoProperties, getByPath, setByPath } from '../src/utils';
+import {
+  normalizePath,
+  isNullOrUndefined,
+  getByPath,
+  setByPath,
+  arrayFromAllowNullOrUndefined,
+} from '../src/utils';
 
 const deepClone = x => JSON.parse(JSON.stringify(x));
 
@@ -12,12 +18,12 @@ test('normalizePath', t => {
   t.throws(() => normalizePath(null));
 });
 
-test('hasNoProperties', t => {
-  t.is(hasNoProperties(null), true);
-  t.is(hasNoProperties(undefined), true);
-  t.is(hasNoProperties(NaN), false);
-  t.is(hasNoProperties(false), false);
-  t.is(hasNoProperties(0), false);
+test('isNullOrUndefined', t => {
+  t.is(isNullOrUndefined(null), true);
+  t.is(isNullOrUndefined(undefined), true);
+  t.is(isNullOrUndefined(NaN), false);
+  t.is(isNullOrUndefined(false), false);
+  t.is(isNullOrUndefined(0), false);
 });
 
 test('getByPath', t => {
@@ -122,4 +128,11 @@ test('setByPath auto detect by path', t => {
 
   cloneObj.b = [undefined, undefined, { c: 3 }];
   t.deepEqual(newObj, cloneObj);
+});
+
+test('arrayFromAllowNullOrUndefined works', t => {
+  t.deepEqual(arrayFromAllowNullOrUndefined(null), []);
+  t.deepEqual(arrayFromAllowNullOrUndefined(undefined), []);
+  t.deepEqual(arrayFromAllowNullOrUndefined(0), []);
+  t.deepEqual(arrayFromAllowNullOrUndefined({}), []);
 });

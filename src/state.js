@@ -1,6 +1,6 @@
 import { EventEmitter2 } from 'eventemitter2';
 import Store from './store';
-import { normalizePath } from './utils';
+import { normalizePath, arrayFromAllowNullOrUndefined } from './utils';
 
 export default class State {
 
@@ -109,4 +109,38 @@ export default class State {
     return this.__store.redo();
   }
 
+  // immutable Array operators
+  __arrayOperator(operator, values) {
+    const array = arrayFromAllowNullOrUndefined(this.get());
+    Array.prototype[operator].apply(array, values);
+    this.set(array);
+  }
+
+  push(...values) {
+    this.__arrayOperator('push', values);
+  }
+
+  pop() {
+    this.__arrayOperator('pop');
+  }
+
+  unshift(...values) {
+    this.__arrayOperator('unshift', values);
+  }
+
+  shift() {
+    this.__arrayOperator('shift');
+  }
+
+  fill(value) {
+    this.__arrayOperator('fill', [value]);
+  }
+
+  reverse() {
+    this.__arrayOperator('reverse');
+  }
+
+  splice(...values) {
+    this.__arrayOperator('splice', values);
+  }
 }
