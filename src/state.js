@@ -19,6 +19,7 @@ export default class State {
     this.__emitter = emitter;
   }
 
+  // basic operators
   cursor(subPath = []) {
     const { __store, __cursor, __emitter } = this;
     subPath = normalizePath(subPath);
@@ -55,6 +56,7 @@ export default class State {
     });
   }
 
+  // tree event emitter
   __generateEventMessage(message) {
     switch (message) {
       case 'change':
@@ -72,14 +74,39 @@ export default class State {
       this.__emitter.off(generatedMessage, callback);
     };
   }
+
   addEventListener(message, callback) {
     return this.on(message, callback);
   }
+
   off(message, callback) {
     const generatedMessage = this.__generateEventMessage(message);
     this.__emitter.off(generatedMessage, callback);
   }
+
   removeEventListener(message, callback) {
     return this.off(message, callback);
   }
+
+  // snapshot support
+  snapshot() {
+    return this.__store.snapshot();
+  }
+
+  canUndo() {
+    return this.__store.canUndo();
+  }
+
+  undo() {
+    return this.__store.undo();
+  }
+
+  canRedo() {
+    return this.__store.canRedo();
+  }
+
+  redo() {
+    return this.__store.redo();
+  }
+
 }
