@@ -159,24 +159,40 @@ test('snapshot data', t => {
   t.is(state.canRedo(), false);
 });
 
-test('immutable Array operators', t => {
+test('Array operators worked', t => {
   const state = new State();
   state.set({
     array: [1, 2, 3],
   });
-  t.deepEqual(state.get('array'), [1, 2, 3]);
-  state.push('array', 4, 5);
-  t.deepEqual(state.get('array'), [1, 2, 3, 4, 5]);
-  state.pop('array');
-  t.deepEqual(state.get('array'), [1, 2, 3, 4]);
-  state.unshift('array', -1, 0);
-  t.deepEqual(state.get('array'), [-1, 0, 1, 2, 3, 4]);
-  state.shift('array');
-  t.deepEqual(state.get('array'), [0, 1, 2, 3, 4]);
-  state.reverse('array');
-  t.deepEqual(state.get('array'), [4, 3, 2, 1, 0]);
-  state.splice('array', 2, 1, 'a');
-  t.deepEqual(state.get('array'), [4, 3, 'a', 1, 0]);
-  state.fill('array', 0);
-  t.deepEqual(state.get('array'), [0, 0, 0, 0, 0]);
+  const cursor = state.cursor('array');
+  t.deepEqual(cursor.get(), [1, 2, 3]);
+  cursor.push(4, 5);
+  t.deepEqual(cursor.get(), [1, 2, 3, 4, 5]);
+  cursor.pop();
+  t.deepEqual(cursor.get(), [1, 2, 3, 4]);
+  cursor.unshift(-1, 0);
+  t.deepEqual(cursor.get(), [-1, 0, 1, 2, 3, 4]);
+  cursor.shift();
+  t.deepEqual(cursor.get(), [0, 1, 2, 3, 4]);
+  cursor.reverse();
+  t.deepEqual(cursor.get(), [4, 3, 2, 1, 0]);
+  cursor.splice(2, 1, 'a');
+  t.deepEqual(cursor.get(), [4, 3, 'a', 1, 0]);
+  cursor.fill(0);
+  t.deepEqual(cursor.get(), [0, 0, 0, 0, 0]);
+});
+
+test('Array operatoers create shallow clone', t => {
+  const state = new State();
+  state.set({
+    array: [1, 2, { data: 3 }],
+  });
+  const cursor = state.cursor('array');
+  const data1 = cursor.get();
+  cursor.push(4, 5);
+  const data2 = cursor.get();
+  t.not(data1, data2);
+  // shallow
+  data1[2].data = 33;
+  t.is(data2[2].data, 33);
 });

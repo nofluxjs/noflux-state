@@ -110,38 +110,37 @@ export default class State {
   }
 
   // immutable Array operators
-  __arrayOperator(subPath, operator, values) {
-    const cursor = this.cursor(subPath);
-    const array = arrayFromAllowNullOrUndefined(cursor.get());
+  __arrayOperator(operator, values) {
+    const array = arrayFromAllowNullOrUndefined(this.get());
     Array.prototype[operator].apply(array, values);
-    cursor.set(array);
+    this.set(array);
   }
 
-  push(subPath, ...values) {
-    this.__arrayOperator(subPath, 'push', values);
+  push(...values) {
+    this.__arrayOperator('push', values);
   }
 
-  pop(subPath) {
-    this.__arrayOperator(subPath, 'pop');
+  pop() {
+    this.__arrayOperator('pop');
   }
 
-  unshift(subPath, ...values) {
-    this.__arrayOperator(subPath, 'unshift', values);
+  unshift(...values) {
+    this.__arrayOperator('unshift', values);
   }
 
-  shift(subPath) {
-    this.__arrayOperator(subPath, 'shift');
+  shift() {
+    this.__arrayOperator('shift');
   }
 
-  fill(subPath, value) {
-    this.__arrayOperator(subPath, 'fill', [value]);
+  fill(value) {
+    this.__arrayOperator('fill', [value]);
   }
 
-  reverse(subPath) {
-    this.__arrayOperator(subPath, 'reverse');
+  reverse() {
+    this.__arrayOperator('reverse');
   }
 
-  splice(subPath, ...values) {
-    this.__arrayOperator(subPath, 'splice', values);
+  splice(...values) {
+    this.__arrayOperator('splice', values);
   }
 }
