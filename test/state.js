@@ -130,6 +130,35 @@ test.cb('listen path with dot', t => {
   }, TEST_TIMEOUT);
 });
 
+test('snapshot data', t => {
+  const state = new State();
+
+  state.set('a.b.c', 1);
+  const data1 = state.get();
+  state.snapshot();
+
+  state.set('a.e.d', 2);
+  const data2 = state.get();
+  state.snapshot();
+
+  // won't be snapshotted
+  state.set('a.f.g', 3);
+
+  // undo(data1)
+  t.is(state.canUndo(), true);
+  state.undo();
+  t.is(state.get(), data1);
+
+  t.is(state.canUndo(), false);
+
+  // redo(data2)
+  t.is(state.canRedo(), true);
+  state.redo();
+  t.is(state.get(), data2);
+
+  t.is(state.canRedo(), false);
+});
+
 test('immutable Array operators', t => {
   const state = new State();
   state.set({
