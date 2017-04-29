@@ -39,19 +39,19 @@ export const shallowClone = (obj, path = '') => {
   }
 };
 
-export const setByPath = (obj = {}, path = [], value) => {
+const HEAD = 'HEAD';
+export const setByPath = (obj, path = [], value) => {
   if (!path.length) {
     return value;
   }
-  const [first, ...rest] = path;
 
-  const newObj = shallowClone(obj);
-  let parentPointer = newObj;
-  let lastNext = first;
-  let pointer = isNullOrUndefined(obj) ? null : obj[first];
-
-  for (let i = 0; i < rest.length; i++) {
-    const next = rest[i];
+  const root = {};
+  root[HEAD] = obj;
+  let parentPointer = root;
+  let lastNext = HEAD;
+  let pointer = obj;
+  for (let i = 0; i < path.length; i++) {
+    const next = path[i];
     parentPointer[lastNext] = shallowClone(pointer, next);
     parentPointer = parentPointer[lastNext];
     lastNext = next;
@@ -63,7 +63,7 @@ export const setByPath = (obj = {}, path = [], value) => {
     }
   }
   parentPointer[lastNext] = value;
-  return newObj;
+  return root[HEAD];
 };
 
 // null or undefined will cause an error
