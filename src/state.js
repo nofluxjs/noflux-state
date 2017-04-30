@@ -1,5 +1,5 @@
-import { EventEmitter2 } from 'eventemitter2';
 import Store from './store';
+import Event from './listener-tree';
 import {
   normalizePath,
   arrayFromAllowNullOrUndefined,
@@ -10,7 +10,7 @@ export default class State {
   constructor({
     store = new Store(),
     cursor = [],
-    emitter = new EventEmitter2({
+    emitter = new Event({
       wildcard: true,
       delimiter: '.',
       // FIXME: is it good?
@@ -53,7 +53,7 @@ export default class State {
       return this.cursor(subPath).set(value);
     }
     this.__store.write(this.__cursor, value);
-    this.__emitter.emit(['change', ...this.__cursor, '**'], {
+    this.__emitter.emit(this.__cursor, {
       path: this.__cursor.join('.'),
       value,
     });
@@ -63,9 +63,9 @@ export default class State {
   __generateEventMessage(message) {
     switch (message) {
       case 'change':
-        return ['change', ...this.__cursor, '**'];
+        return this.__cursor;
       default:
-        return message;
+        throw new Error('only change event allow');
     }
   }
 
@@ -74,7 +74,7 @@ export default class State {
     this.__emitter.on(generatedMessage, callback);
     // return cleanup handler
     return () => {
-      this.__emitter.off(generatedMessage, callback);
+      this.__emitter.off(callback);
     };
   }
 
@@ -82,13 +82,12 @@ export default class State {
     return this.on(message, callback);
   }
 
-  off(message, callback) {
-    const generatedMessage = this.__generateEventMessage(message);
-    this.__emitter.off(generatedMessage, callback);
+  off(callback) {
+    this.__emitter.off(callback);
   }
 
-  removeEventListener(message, callback) {
-    return this.off(message, callback);
+  removeEventListener(callback) {
+    return this.off(callback);
   }
 
   // snapshot support

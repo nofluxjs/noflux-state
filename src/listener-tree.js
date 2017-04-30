@@ -35,13 +35,14 @@ export default class ListenerTree {
     const listenerId = listener[SYMBOL_NOFLUX].id;
     let pointer = this.__tree;
     // this will add listener to subtreeListener for every node on path except last
-    // e.g. on('a.b.c') will modify subtreeListener on path '' and 'a' and 'a.b'
+    // e.g. on('a.b.c') will modify subtreeListener on path '' and 'a' and 'a.b' and 'a.b.c'
+    pointer.subtreeListeners[listenerId] = listener;
     for (let i = 0; i < path.length; i++) {
       const next = path[i];
-      pointer.subtreeListeners[listenerId] = listener;
       if (pointer.children[next] === undefined) {
         pointer.children[next] = new ListenerTreeNode();
       }
+      pointer.children[next].subtreeListeners[listenerId] = listener;
       pointer = pointer.children[next];
     }
     // only add ownListener at the end of path, e.g. 'a.b.c'
@@ -99,15 +100,15 @@ export default class ListenerTree {
     return listeners;
   }
 
-  // path [a, b, ..., m, n] will emit
-  // merge(ownListener[a], ownListener[b], ..., ownListener[m], subtreeListener[n])
+  // path [a, b, ..., n] will emit
+  // merge(ownListener[root], ownListener[a], ownListener[b], ..., subtreeListener[n])
   emit(path, data) {
     const listeners = this.__getListenersByEmitPath(path);
     for (const listenerId in listeners) {
       const listener = listeners[listenerId];
       // prevent to call if listener is off while emit
       if (listener !== undefined) {
-        listener(path, data);
+        listener(data);
       }
     }
   }

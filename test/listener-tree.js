@@ -6,8 +6,7 @@ test('trig on parent node emit', t => {
   const emitPath = ['a'];
   const emitValue = {};
   let callCount = 0;
-  const callback = (path, value) => {
-    t.deepEqual(path, emitPath);
+  const callback = value => {
     t.is(value, emitValue);
     callCount += 1;
   };
@@ -22,8 +21,7 @@ test('trig on parent node emit when parent is root', t => {
   const emitPath = [];
   const emitValue = {};
   let callCount = 0;
-  const callback = (path, value) => {
-    t.deepEqual(path, emitPath);
+  const callback = value => {
     t.is(value, emitValue);
     callCount += 1;
   };
@@ -38,8 +36,7 @@ test('trig on child nodes emit', t => {
   const emitPath = ['a', 'b'];
   const emitValue = {};
   let callCount = 0;
-  const callback = (path, value) => {
-    t.deepEqual(path, emitPath);
+  const callback = value => {
     t.is(value, emitValue);
     callCount += 1;
   };
@@ -54,8 +51,7 @@ test('trig on child nodes emit when listen to root', t => {
   const emitPath = ['a', 'b'];
   const emitValue = {};
   let callCount = 0;
-  const callback = (path, value) => {
-    t.deepEqual(path, emitPath);
+  const callback = value => {
     t.is(value, emitValue);
     callCount += 1;
   };
@@ -69,14 +65,12 @@ test('callback  unique', t => {
   const emitPath = ['a', 'b'];
   const emitValue = {};
   let call1Count = 0;
-  const callback1 = (path, value) => {
-    t.deepEqual(path, emitPath);
+  const callback1 = value => {
     t.is(value, emitValue);
     call1Count += 1;
   };
   let call2Count = 0;
-  const callback2 = (path, value) => {
-    t.deepEqual(path, emitPath);
+  const callback2 = value => {
     t.is(value, emitValue);
     call2Count += 1;
   };
@@ -102,8 +96,7 @@ test('off worked', t => {
   const emitPath = ['a', 'b'];
   const emitValue = {};
   let callCount = 0;
-  const callback = (path, value) => {
-    t.deepEqual(path, emitPath);
+  const callback = value => {
     t.is(value, emitValue);
     callCount += 1;
   };
