@@ -1,3 +1,5 @@
+export const SYMBOL_NOFLUX = '__noflux';
+
 export const normalizePath = path => {
   if (Array.isArray(path)) {
     return path;

@@ -64,7 +64,7 @@ test('trig on child nodes emit when listen to root', t => {
   t.is(callCount, 1);
 });
 
-test('different callback should not be unique', t => {
+test('callback  unique', t => {
   const event = new ListenerTree();
   const emitPath = ['a', 'b'];
   const emitValue = {};
@@ -86,4 +86,38 @@ test('different callback should not be unique', t => {
   event.emit(emitPath, emitValue);
   t.is(call1Count, 1);
   t.is(call2Count, 1);
+});
+
+test('not trig on different path', t => {
+  const event = new ListenerTree();
+  const emitPath = ['b'];
+  const emitValue = {};
+  const callback = () => t.fail('should not be called');
+  event.on(['a'], callback);
+  event.emit(emitPath, emitValue);
+});
+
+test('off worked', t => {
+  const event = new ListenerTree();
+  const emitPath = ['a', 'b'];
+  const emitValue = {};
+  let callCount = 0;
+  const callback = (path, value) => {
+    t.deepEqual(path, emitPath);
+    t.is(value, emitValue);
+    callCount += 1;
+  };
+  event.on([], callback);
+  event.on(['a'], callback);
+  event.on(['a', 'b'], callback);
+  event.emit(emitPath, emitValue);
+  t.is(callCount, 1);
+
+  event.off(callback);
+  event.emit(emitPath, emitValue);
+  t.is(callCount, 1);
+
+  event.on(['d'], () => {});
+  event.emit(emitPath, emitValue);
+  t.is(callCount, 1);
 });

@@ -1,6 +1,9 @@
 import { EventEmitter2 } from 'eventemitter2';
 import Store from './store';
-import { normalizePath, arrayFromAllowNullOrUndefined } from './utils';
+import {
+  normalizePath,
+  arrayFromAllowNullOrUndefined,
+} from './utils';
 
 export default class State {
 
