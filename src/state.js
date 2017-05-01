@@ -1,5 +1,5 @@
 import Store from './store';
-import Event from './listener-tree';
+import ListenerTree from './listener-tree';
 import {
   normalizePath,
   arrayFromAllowNullOrUndefined,
@@ -10,12 +10,7 @@ export default class State {
   constructor({
     store = new Store(),
     cursor = [],
-    emitter = new Event({
-      wildcard: true,
-      delimiter: '.',
-      // FIXME: is it good?
-      maxListeners: Infinity,
-    }),
+    emitter = new ListenerTree(),
   } = {}) {
     this.__store = store;
     this.__cursor = cursor;
