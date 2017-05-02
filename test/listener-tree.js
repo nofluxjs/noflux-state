@@ -91,7 +91,7 @@ test('not trig on different path', t => {
   event.emit(emitPath, emitValue);
 });
 
-test('off worked', t => {
+test('offAll worked', t => {
   const event = new ListenerTree();
   const emitPath = ['a', 'b'];
   const emitValue = {};
@@ -106,7 +106,7 @@ test('off worked', t => {
   event.emit(emitPath, emitValue);
   t.is(callCount, 1);
 
-  event.off(callback);
+  event.offAll(callback);
   event.emit(emitPath, emitValue);
   t.is(callCount, 1);
 

@@ -69,7 +69,7 @@ export default class State {
     this.__emitter.on(generatedMessage, callback);
     // return cleanup handler
     return () => {
-      this.__emitter.off(callback);
+      this.__emitter.offAll(callback);
     };
   }
 
@@ -78,11 +78,11 @@ export default class State {
   }
 
   off(callback) {
-    this.__emitter.off(callback);
+    this.__emitter.offAll(callback);
   }
 
   removeEventListener(callback) {
-    return this.off(callback);
+    return this.offAll(callback);
   }
 
   // snapshot support

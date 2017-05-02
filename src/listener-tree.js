@@ -100,65 +100,28 @@ export default class ListenerTree {
     this.addListener(path, listener);
   }
 
-  // on(path, listener) {
-  //   if (typeof listener !== 'function') {
-  //     throw new TypeError('"listener" argument must be a function');
-  //   }
-  //   // unique id for each listener
-  //   if (listener[SYMBOL_NOFLUX] === undefined) {
-  //     Object.defineProperty(listener, SYMBOL_NOFLUX, {
-  //       enumerable: false,
-  //       writable: true,
-  //       configurable: true,
-  //       value: { id: getRandomId() },
-  //     });
-  //   }
-  //   const listenerId = listener[SYMBOL_NOFLUX].id;
-  //   let pointer = this.__tree;
-  //   // this will add listener to subtreeListener for every node on path except last
-  //   // e.g. on('a.b.c') will modify subtreeListener on path '' and 'a' and 'a.b' and 'a.b.c'
-  //   pointer.subtreeListeners[listenerId] = listener;
-  //   for (let i = 0; i < path.length; i++) {
-  //     const next = path[i];
-  //     if (pointer.children[next] === undefined) {
-  //       pointer.children[next] = new ListenerTreeNode();
-  //     }
-  //     pointer.children[next].subtreeListeners[listenerId] = listener;
-  //     pointer = pointer.children[next];
-  //   }
-  //   // only add ownListener at the end of path, e.g. 'a.b.c'
-  //   pointer.ownListeners[listenerId] = listener;
-  // }
-
-  __offOnNode(node, listenerId) {
-    if (node.ownListeners[listenerId]) {
-      delete node.ownListeners[listenerId];
-    }
-    if (node.subtreeListeners[listenerId]) {
-      let hasSubtreeListener = false;
-      for (const child in node.children) {
-        const childNode = node.children[child];
-        this.__offOnNode(childNode, listenerId);
-        if (childNode.subtreeListeners[listenerId] || childNode.ownListeners[listenerId]) {
-          hasSubtreeListener = true;
-        } else {
-          delete node.children[child];
-        }
-      }
-      if (!hasSubtreeListener) {
-        delete node.subtreeListeners[listenerId];
-      }
-    }
-  }
-
-  off(listener) {
+  offAll(listener) {
     if (typeof listener !== 'function') {
       throw new TypeError('"listener" argument must be a function');
     }
     if (listener[SYMBOL_NOFLUX] === undefined) {
       return;
     }
-    this.__offOnNode(this.__tree, listener[SYMBOL_NOFLUX].id);
+    const listenerId = listener[SYMBOL_NOFLUX].id;
+    this.__traverse({
+      callbackAfterRecursion: node => {
+        node.ownListenersTime[listenerId] -= 1;
+        if (node.ownListenersTime[listenerId] === 0) {
+          delete node.ownListenersTime[listenerId];
+          delete node.ownListeners[listenerId];
+        }
+        node.updateSubtreeListeners();
+      },
+    });
+  }
+
+  removeAllListeners(listener) {
+    this.offAll(listener);
   }
 
   __getListenersByEmitPath(path) {
