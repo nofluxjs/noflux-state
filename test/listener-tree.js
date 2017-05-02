@@ -1,5 +1,13 @@
 import test from 'ava';
-import ListenerTree from '../src/listener-tree';
+import ListenerTree, { getListenerId } from '../src/listener-tree';
+
+test('getListenerId', t => {
+  const callback = () => {};
+  t.falsy(getListenerId(callback));
+  const listenerId = getListenerId(callback, true);
+  t.truthy(listenerId);
+  t.is(getListenerId(callback), listenerId);
+});
 
 test('trig on parent node emit', t => {
   const event = new ListenerTree();
@@ -91,6 +99,43 @@ test('not trig on different path', t => {
   event.emit(emitPath, emitValue);
 });
 
+test('off worked', t => {
+  const event = new ListenerTree();
+  const emitPath = ['a', 'b'];
+  const emitValue = {};
+  let callCount = 0;
+  const callback = value => {
+    t.is(value, emitValue);
+    callCount += 1;
+  };
+  event.on(['a'], callback);
+  event.on(['a'], callback);
+  event.on(['a', 'b'], callback);
+  event.emit(emitPath, emitValue);
+  t.is(callCount, 1);
+
+  event.off(['a'], callback);
+  event.emit(emitPath, emitValue);
+  t.is(callCount, 2);
+
+  event.off(['a'], callback);
+  event.emit(emitPath, emitValue);
+  t.is(callCount, 3);
+
+  // off wrong path will be ignore
+  event.off(['a'], callback);
+  event.emit(emitPath, emitValue);
+  t.is(callCount, 4);
+
+  event.off(['a', 'b'], callback);
+  event.emit(emitPath, emitValue);
+  t.is(callCount, 4); // worked
+
+  event.on(['d'], () => {});
+  event.emit(emitPath, emitValue);
+  t.is(callCount, 4);
+});
+
 test('offAll worked', t => {
   const event = new ListenerTree();
   const emitPath = ['a', 'b'];
@@ -100,7 +145,7 @@ test('offAll worked', t => {
     t.is(value, emitValue);
     callCount += 1;
   };
-  event.on([], callback);
+  event.on(['a'], callback);
   event.on(['a'], callback);
   event.on(['a', 'b'], callback);
   event.emit(emitPath, emitValue);
