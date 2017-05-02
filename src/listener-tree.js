@@ -13,9 +13,13 @@ import {
  */
 export class ListenerTreeNode {
   children = {};
+
   subtreeListeners = {};
+
   ownListeners = {};
+
   ownListenersTime = {};
+
   updateSubtreeListeners() {
     const childrenSubtreeListeners = Object.keys(this.children)
       .map(child => this.children[child].subtreeListeners);
@@ -24,24 +28,30 @@ export class ListenerTreeNode {
       this.ownListeners,
       ...childrenSubtreeListeners,
     ];
-    this.subtreeListeners = Object.assign.apply(null, listenersToMerge);
+    this.subtreeListeners = Object.assign(...listenersToMerge);
   }
 }
 
 export default class ListenerTree {
-
   __tree = new ListenerTreeNode();
 
   __traverse({
     path,
+    createEmptyPath,
     callbackBeforeRecursion,
     callbackAfterRecursion,
     callbackAtBottom,
   }) {
     function traverse(node, index) {
-      if (path && index === path.length) {
-        if (callbackAtBottom) {
-          callbackAtBottom(node);
+      let isAtBottom = false;
+      if (path) {
+        if (index === path.length) {
+          isAtBottom = true;
+        } else if (!createEmptyPath && node.children[path[index]] === undefined) {
+          isAtBottom = true;
+        }
+        if (isAtBottom && callbackAtBottom) {
+          callbackAtBottom(node, index);
         }
       }
       if (callbackBeforeRecursion) {
@@ -49,7 +59,7 @@ export default class ListenerTree {
       }
       let childrenName;
       if (path) {
-        childrenName = index === path.length ? [] : [path[index]];
+        childrenName = isAtBottom ? [] : [path[index]];
       } else {
         childrenName = Object.keys(node.children);
       }
@@ -84,6 +94,7 @@ export default class ListenerTree {
     const listenerId = listener[SYMBOL_NOFLUX].id;
     this.__traverse({
       path,
+      createEmptyPath: true,
       callbackAfterRecursion: node => node.updateSubtreeListeners(),
       callbackAtBottom: node => {
         if (node.ownListenersTime[listenerId] > 0) {
@@ -124,30 +135,25 @@ export default class ListenerTree {
     this.offAll(listener);
   }
 
-  __getListenersByEmitPath(path) {
-    const listeners = {};
-    let pointer = this.__tree;
-    for (let i = 0; i < path.length; i++) {
-      const next = path[i];
-      if (Object.keys(pointer.ownListeners).length) {
-        // not use { ...listeners } for better performance
-        // because listeners should be override for unique
-        Object.assign(listeners, pointer.ownListeners);
-      }
-      // no more child listener found, e.g. on('a.b') emit('a.b.c')
-      if (pointer.children[next] === undefined) {
-        return listeners;
-      }
-      pointer = pointer.children[next];
-    }
-    Object.assign(listeners, pointer.subtreeListeners);
-    return listeners;
-  }
-
   // path [a, b, ..., n] will emit
   // merge(ownListener[root], ownListener[a], ownListener[b], ..., subtreeListener[n])
   emit(path, data) {
-    const listeners = this.__getListenersByEmitPath(path);
+    const listenersToMerge = [[]];
+    this.__traverse({
+      path,
+      callbackAtBottom: (node, index) => {
+        // if emit an empty path, there is no subtree
+        if (index >= path.length) {
+          listenersToMerge.push(node.subtreeListeners);
+        }
+      },
+      callbackAfterRecursion: node => {
+        if (Object.keys(node.ownListeners).length) {
+          listenersToMerge.push(node.ownListeners);
+        }
+      },
+    });
+    const listeners = Object.assign(...listenersToMerge);
     for (const listenerId in listeners) {
       const listener = listeners[listenerId];
       // prevent to call if listener is off while emit
