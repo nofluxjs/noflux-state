@@ -60,7 +60,7 @@ test('trig on child nodes emit when listen to root', t => {
   t.is(callCount, 1);
 });
 
-test('callback  unique', t => {
+test('callback unique', t => {
   const event = new ListenerTree();
   const emitPath = ['a', 'b'];
   const emitValue = {};
