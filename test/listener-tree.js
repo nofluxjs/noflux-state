@@ -110,52 +110,20 @@ test('off worked', t => {
   };
   event.on(['a'], callback);
   event.on(['a'], callback);
-  event.on(['a', 'b'], callback);
   event.emit(emitPath, emitValue);
   t.is(callCount, 1);
 
+  // off will remove all the callback at path 'a'
   event.off(['a'], callback);
   event.emit(emitPath, emitValue);
-  t.is(callCount, 2);
-
-  event.off(['a'], callback);
-  event.emit(emitPath, emitValue);
-  t.is(callCount, 3);
+  t.is(callCount, 1);
 
   // off wrong path will be ignore
-  event.off(['a'], callback);
-  event.emit(emitPath, emitValue);
-  t.is(callCount, 4);
-
-  event.off(['a', 'b'], callback);
-  event.emit(emitPath, emitValue);
-  t.is(callCount, 4); // worked
-
-  event.on(['d'], () => {});
-  event.emit(emitPath, emitValue);
-  t.is(callCount, 4);
-});
-
-test('offAll worked', t => {
-  const event = new ListenerTree();
-  const emitPath = ['a', 'b'];
-  const emitValue = {};
-  let callCount = 0;
-  const callback = value => {
-    t.is(value, emitValue);
-    callCount += 1;
-  };
-  event.on(['a'], callback);
-  event.on(['a'], callback);
-  event.on(['a', 'b'], callback);
+  event.off(['b'], callback);
   event.emit(emitPath, emitValue);
   t.is(callCount, 1);
 
-  event.offAll(callback);
-  event.emit(emitPath, emitValue);
-  t.is(callCount, 1);
-
-  event.on(['d'], () => {});
+  event.on(['c'], () => {});
   event.emit(emitPath, emitValue);
   t.is(callCount, 1);
 });

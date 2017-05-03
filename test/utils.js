@@ -1,6 +1,9 @@
 import test from 'ava';
 import {
-  normalizePath,
+  escapePath,
+  unescapePath,
+  parsePath,
+  stringifyPath,
   isNullOrUndefined,
   getByPath,
   setByPath,
@@ -9,13 +12,49 @@ import {
 
 const deepClone = x => JSON.parse(JSON.stringify(x));
 
-test('normalizePath', t => {
-  t.deepEqual(normalizePath(''), []);
-  t.deepEqual(normalizePath('a'), ['a']);
-  t.deepEqual(normalizePath('a.b'), ['a', 'b']);
-  t.deepEqual(normalizePath('a.b.c'), ['a', 'b', 'c']);
-  t.deepEqual(normalizePath('a..b'), ['a', 'b']);
-  t.throws(() => normalizePath(null));
+const testPath = {
+  '': [],
+  a: ['a'],
+  'a.b': ['a', 'b'],
+  'a.b.c': ['a', 'b', 'c'],
+  'a~0b': ['a.b'],
+  'a~1b': ['a~b'],
+};
+
+test('escapePath', t => {
+  t.deepEqual(escapePath('a'), 'a');
+  t.deepEqual(escapePath('a.b'), 'a~0b');
+  t.deepEqual(escapePath('a~b'), 'a~1b');
+});
+
+test('unescapePath', t => {
+  t.deepEqual(unescapePath('a'), 'a');
+  t.deepEqual(unescapePath('a~0b'), 'a.b');
+  t.deepEqual(unescapePath('a~1b'), 'a~b');
+});
+
+test('parsePath', t => {
+  for (const pathStr of Object.keys(testPath)) {
+    const pathArray = testPath[pathStr];
+    t.deepEqual(parsePath(pathStr), pathArray);
+  }
+  t.throws(() => parsePath(null));
+});
+
+test('stringifyPath', t => {
+  for (const pathStr of Object.keys(testPath)) {
+    const pathArray = testPath[pathStr];
+    t.deepEqual(stringifyPath(pathArray), pathStr);
+  }
+  t.throws(() => stringifyPath(null));
+});
+
+test('parsePath and stringifyPath', t => {
+  for (const pathStr of Object.keys(testPath)) {
+    const pathArray = testPath[pathStr];
+    t.deepEqual(parsePath(stringifyPath(pathArray)), pathArray);
+    t.deepEqual(stringifyPath(stringifyPath(pathStr)), pathStr);
+  }
 });
 
 test('isNullOrUndefined', t => {

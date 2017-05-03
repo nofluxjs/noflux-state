@@ -73,7 +73,7 @@ test.cb('event listen and off', t => {
   state.set('a.b', 1);
   state.set('c.d', 1);
   // remove listener
-  state.off(callback);
+  state.off('change', callback);
   state.set('', 1);
   setTimeout(() => {
     t.end();

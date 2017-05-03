@@ -1,5 +1,7 @@
+/* eslint-disable */
+import { stringifyPath } from '../src/utils';
 function pathify(p) {
-  if (Array.isArray(p)) p = p.join('.');
+  if (Array.isArray(p)) p = stringifyPath(p);
   return '$$_' + p; // prepend special symbols to avoid name conflict with protos
 }
 function keyify(path, listener) {
@@ -36,7 +38,8 @@ class ListenTree {
     const path = pathify(p);
     const listeners = {};
     Object.keys(this._listeners).forEach(p2 => {
-      if (p2.indexOf(path) !== 0 && path.indexOf(p2) !== 0) return;
+      if (path !== '' && p2 !== ''
+        && p2.indexOf(path) !== 0 && path.indexOf(p2) !== 0) return;
       (this._listeners[p2] || []).forEach(listener => {
         listeners[listener.$id] = listener;
       });

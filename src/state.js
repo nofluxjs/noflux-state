@@ -1,7 +1,7 @@
 import Store from './store';
 import ListenerTree from './listener-tree';
 import {
-  normalizePath,
+  parsePath,
   arrayFromAllowNullOrUndefined,
 } from './utils';
 
@@ -20,7 +20,7 @@ export default class State {
   // basic operators
   cursor(subPath = []) {
     const { __store, __cursor, __emitter } = this;
-    subPath = normalizePath(subPath);
+    subPath = parsePath(subPath);
     return new State({
       store: __store,
       cursor: __cursor.concat(subPath),
@@ -66,23 +66,20 @@ export default class State {
 
   on(message, callback) {
     const generatedMessage = this.__generateEventMessage(message);
-    this.__emitter.on(generatedMessage, callback);
-    // return cleanup handler
-    return () => {
-      this.__emitter.offAll(callback);
-    };
+    return this.__emitter.on(generatedMessage, callback);
   }
 
   addEventListener(message, callback) {
     return this.on(message, callback);
   }
 
-  off(callback) {
-    this.__emitter.offAll(callback);
+  off(message, callback) {
+    const generatedMessage = this.__generateEventMessage(message);
+    this.__emitter.off(generatedMessage, callback);
   }
 
-  removeEventListener(callback) {
-    return this.offAll(callback);
+  removeEventListener(message, callback) {
+    this.off(message, callback);
   }
 
   // snapshot support

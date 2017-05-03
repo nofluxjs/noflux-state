@@ -1,10 +1,36 @@
 export const SYMBOL_NOFLUX = '__noflux';
 
-export const normalizePath = path => {
+/*
+ * JSON Pointer style escape
+ * http://tools.ietf.org/html/rfc6901
+ */
+export const escapePath = path => path.replace(/~/g, '~1').replace(/\./g, '~0');
+export const unescapePath = path => path.replace(/~0/g, '.').replace(/~1/g, '~');
+
+export const parsePath = path => {
   if (Array.isArray(path)) {
     return path;
-  } else if (typeof path === 'string') {
-    return path.split('.').filter(subPath => subPath.length);
+  }
+  if (typeof path === 'string') {
+    if (!path.length) {
+      return [];
+    }
+    // path with dot, e.g. 'a~1b.c' => ['a.b', 'c']
+    if (path.indexOf('~') !== -1) {
+      return path.split('.').map(unescapePath);
+    }
+    return path.split('.');
+  }
+  throw Error(`State.prototype.cursor only accept string or array, ${typeof path} is forbidden`);
+};
+
+export const stringifyPath = path => {
+  if (typeof path === 'string') {
+    return path;
+  }
+  if (Array.isArray(path)) {
+    // path with dot, e.g. ['a.b', 'c'] => 'a~1b.c'
+    return path.map(escapePath).join('.');
   }
   throw Error(`State.prototype.cursor only accept string or array, ${typeof path} is forbidden`);
 };
@@ -74,4 +100,8 @@ export const arrayFromAllowNullOrUndefined = arrayLike => (
   isNullOrUndefined(arrayLike) ? [] : [...arrayLike]
 );
 
-export const getRandomId = () => Math.random().toString(16).slice(2);
+let count = 1;
+export const getNextId = () => {
+  count += 1;
+  return count;
+};
