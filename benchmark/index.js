@@ -7,12 +7,16 @@ import HashListenerTree from './hash-listener-tree';
 const listenerTree = new ListenersTree();
 const hashListenerTree = new HashListenerTree();
 
-const cb1 = () => {};
-const cb2 = () => {};
-const cb3 = () => {};
-const cb4 = () => {};
-const cb5 = () => {};
-const cb6 = () => {};
+const work = () => {
+  let i = 10;
+  while(i--);
+}
+const cb1 = () => { work(); };
+const cb2 = () => { work(); };
+const cb3 = () => { work(); };
+const cb4 = () => { work(); };
+const cb5 = () => { work(); };
+const cb6 = () => { work(); };
 const run = event => {
   event.on(['a', 'b'], cb1);
   event.on(['a', 'b', 'c'], cb2);
