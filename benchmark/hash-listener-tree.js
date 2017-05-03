@@ -1,19 +1,24 @@
 function pathify(p) {
   if (Array.isArray(p)) p = p.join('.');
-  return `$$_${p}`; // prepend special symbols to avoid name conflict with protos
+  return '$$_' + p; // prepend special symbols to avoid name conflict with protos
 }
-export default class HashListenerTree {
+class ListenTree {
   constructor() {
     this._listeners = [];
-    this._count = 0;
+    this._count = 1;
+    this._listened = {};
   }
 
   on(p, listener) {
     const path = pathify(p);
+    if (!listener.$id) {
+      listener.$id = this._count++;
+    }
+    const key = path + '//' + listener.$id;
+    if (this._listened[key]) return;
     if (!this._listeners[path]) this._listeners[path] = [];
     this._listeners[path].push(listener);
-    this._count += 1;
-    listener.$id = this._count;
+    this._listened[key] = true; 
   }
 
   off(p, listener) {
@@ -35,3 +40,6 @@ export default class HashListenerTree {
     Object.keys(listeners).forEach(k => listeners[k]());
   }
 }
+
+module.exports = ListenTree;
+
