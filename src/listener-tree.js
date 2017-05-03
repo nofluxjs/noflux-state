@@ -33,7 +33,7 @@ export class ListenerTreeNode {
   children = {};
   subtreeListeners = {};
   ownListeners = {};
-  ownListenersTime = {};
+  ownListenersCount = {};
 
   updateSubtreeListeners() {
     const childrenSubtreeListeners = Object.keys(this.children)
@@ -100,11 +100,11 @@ export default class ListenerTree {
       createEmptyPath: true,
       callbackAfterRecursion: node => node.updateSubtreeListeners(),
       callbackAtBottom: node => {
-        if (node.ownListenersTime[listenerId] > 0) {
-          node.ownListenersTime[listenerId] += 1;
+        if (node.ownListenersCount[listenerId] > 0) {
+          node.ownListenersCount[listenerId] += 1;
         } else {
           node.ownListeners[listenerId] = listener;
-          node.ownListenersTime[listenerId] = 1;
+          node.ownListenersCount[listenerId] = 1;
         }
       },
     });
@@ -120,9 +120,9 @@ export default class ListenerTree {
       callbackAfterRecursion: node => node.updateSubtreeListeners(),
       callbackAtBottom: node => {
         if (node.ownListeners[listenerId]) {
-          node.ownListenersTime[listenerId] -= 1;
-          if (node.ownListenersTime[listenerId] === 0) {
-            delete node.ownListenersTime[listenerId];
+          node.ownListenersCount[listenerId] -= 1;
+          if (node.ownListenersCount[listenerId] === 0) {
+            delete node.ownListenersCount[listenerId];
             delete node.ownListeners[listenerId];
           }
         }
@@ -135,7 +135,7 @@ export default class ListenerTree {
     this.__traverse({
       callbackAfterRecursion: node => {
         if (node.ownListeners[listenerId]) {
-          delete node.ownListenersTime[listenerId];
+          delete node.ownListenersCount[listenerId];
           delete node.ownListeners[listenerId];
         }
         node.updateSubtreeListeners();
