@@ -11,25 +11,20 @@ const work = () => {
   let i = 10;
   while(i--);
 }
-const cb1 = () => { work(); };
-const cb2 = () => { work(); };
-const cb3 = () => { work(); };
-const cb4 = () => { work(); };
-const cb5 = () => { work(); };
-const cb6 = () => { work(); };
 const run = event => {
-  event.on(['a', 'b'], cb1);
-  event.on(['a', 'b', 'c'], cb2);
-  event.on(['a', 'b', 'd'], cb3);
-  event.on(['a', 'b', 'f'], cb4);
-  event.on(['a', 'b', 'h'], cb5);
-  event.on(['a'], cb6);
+  const cb = () => { work(); };
+  event.on(['a', 'b'], cb);
+  event.on(['a', 'b', 'c'], cb);
+  event.on(['a', 'b', 'd'], cb);
+  event.on(['a', 'b', 'f'], cb);
+  event.on(['a', 'b', 'h'], cb);
+  event.on(['a'], cb);
   event.emit(['a']);
   event.emit(['b']);
   event.emit(['a', 'b']);
   event.emit([]);
   event.emit(['a', 'b', 'h']);
-  event.off(['a', 'b'], cb1);
+  event.off(['a', 'b'], cb);
 };
 
 const suite = new Suite();

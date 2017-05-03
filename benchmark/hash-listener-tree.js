@@ -3,7 +3,7 @@ function pathify(p) {
   return '$$_' + p; // prepend special symbols to avoid name conflict with protos
 }
 function keyify(path, listener) {
-  return path + '//' + listener.$id;
+  return path + '//' + listener;
 }
 class ListenTree {
   constructor() {
@@ -21,7 +21,7 @@ class ListenTree {
     if (this._listened[key]) return;
     if (!this._listeners[path]) this._listeners[path] = [];
     this._listeners[path].push(listener);
-    this._listened[key] = true; 
+    this._listened[key] = true;
   }
 
   off(p, listener) {
@@ -29,7 +29,7 @@ class ListenTree {
     const listeners = this._listeners[path];
     if (!listeners || !listeners.length) return;
     listeners.splice(listeners.indexOf(listener), 1);
-    this._listened[keyify(path, listener)] = false; 
+    this._listened[keyify(path, listener)] = false;
   }
 
   emit(p) {
