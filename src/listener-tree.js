@@ -2,7 +2,7 @@ import {
   SYMBOL_NOFLUX,
   getNextId,
   removeFirstFromArray,
-} from '../src/utils';
+} from './utils';
 
 // reduce property get times will accelerate 10%~15%
 const SYMBOL_NOFLUX_ID = `${SYMBOL_NOFLUX}_id`;
