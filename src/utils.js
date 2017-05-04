@@ -39,7 +39,7 @@ export const isNullOrUndefined = obj => obj === undefined || obj === null;
 
 export const getByPath = (obj, path) => {
   let pointer = obj;
-  for (let i = 0; i < path.length; i++) {
+  for (let i = 0; i < path.length; i += 1) {
     const next = path[i];
     // only null and undefined has no properties
     // ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/No_properties
@@ -78,7 +78,7 @@ export const setByPath = (obj, path = [], value) => {
   let parentPointer = root;
   let lastNext = HEAD;
   let pointer = obj;
-  for (let i = 0; i < path.length; i++) {
+  for (let i = 0; i < path.length; i += 1) {
     const next = path[i];
     parentPointer[lastNext] = shallowClone(pointer, next);
     parentPointer = parentPointer[lastNext];
@@ -104,4 +104,16 @@ let count = 1;
 export const getNextId = () => {
   count += 1;
   return count;
+};
+
+export const removeFirstFromArray = (array, value) => {
+  const pos = array.indexOf(value);
+  if (pos !== -1) {
+    // about 1.5x faster than the two-arg version of Array#splice() as nodejs said
+    // https://github.com/nodejs/node/blob/v6.x/lib/events.js#L470-L475
+    for (let i = pos, k = i + 1, n = array.length; k < n; i += 1, k += 1) {
+      array[i] = array[k];
+    }
+    array.pop();
+  }
 };

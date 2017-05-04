@@ -8,6 +8,7 @@ import {
   getByPath,
   setByPath,
   arrayFromAllowNullOrUndefined,
+  removeFirstFromArray,
 } from '../src/utils';
 
 const deepClone = x => JSON.parse(JSON.stringify(x));
@@ -174,4 +175,13 @@ test('arrayFromAllowNullOrUndefined works', t => {
   t.deepEqual(arrayFromAllowNullOrUndefined(undefined), []);
   t.deepEqual(arrayFromAllowNullOrUndefined(0), []);
   t.deepEqual(arrayFromAllowNullOrUndefined({}), []);
+});
+
+test('removeFirstFromArray', t => {
+  const array = [1, 2, 3, 4, 5];
+  removeFirstFromArray(array, 3);
+  t.deepEqual(array, [1, 2, 4, 5]);
+  // remove non-existing value
+  removeFirstFromArray(array, 0);
+  t.deepEqual(array, [1, 2, 4, 5]);
 });

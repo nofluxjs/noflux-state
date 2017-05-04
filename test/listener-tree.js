@@ -110,20 +110,28 @@ test('off worked', t => {
   };
   event.on(['a'], callback);
   event.on(['a'], callback);
+  event.on(['a', 'b'], callback);
   event.emit(emitPath, emitValue);
   t.is(callCount, 1);
 
-  // off will remove all the callback at path 'a'
   event.off(['a'], callback);
   event.emit(emitPath, emitValue);
-  t.is(callCount, 1);
+  t.is(callCount, 2);
+
+  event.off(['a'], callback);
+  event.emit(emitPath, emitValue);
+  t.is(callCount, 3);
 
   // off wrong path will be ignore
-  event.off(['b'], callback);
+  event.off(['a'], callback);
   event.emit(emitPath, emitValue);
-  t.is(callCount, 1);
+  t.is(callCount, 4);
 
-  event.on(['c'], () => {});
+  event.off(['a', 'b'], callback);
   event.emit(emitPath, emitValue);
-  t.is(callCount, 1);
+  t.is(callCount, 4); // worked
+
+  event.on(['d'], () => {});
+  event.emit(emitPath, emitValue);
+  t.is(callCount, 4);
 });
