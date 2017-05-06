@@ -1,21 +1,61 @@
 import test from 'ava';
 import {
-  normalizePath,
+  escapePath,
+  unescapePath,
+  parsePath,
+  stringifyPath,
   isNullOrUndefined,
   getByPath,
   setByPath,
   arrayFromAllowNullOrUndefined,
+  removeFirstFromArray,
 } from '../src/utils';
 
 const deepClone = x => JSON.parse(JSON.stringify(x));
 
-test('normalizePath', t => {
-  t.deepEqual(normalizePath(''), []);
-  t.deepEqual(normalizePath('a'), ['a']);
-  t.deepEqual(normalizePath('a.b'), ['a', 'b']);
-  t.deepEqual(normalizePath('a.b.c'), ['a', 'b', 'c']);
-  t.deepEqual(normalizePath('a..b'), ['a', 'b']);
-  t.throws(() => normalizePath(null));
+const testPath = {
+  '': [],
+  a: ['a'],
+  'a.b': ['a', 'b'],
+  'a.b.c': ['a', 'b', 'c'],
+  'a~0b': ['a.b'],
+  'a~1b': ['a~b'],
+};
+
+test('escapePath', t => {
+  t.deepEqual(escapePath('a'), 'a');
+  t.deepEqual(escapePath('a.b'), 'a~0b');
+  t.deepEqual(escapePath('a~b'), 'a~1b');
+});
+
+test('unescapePath', t => {
+  t.deepEqual(unescapePath('a'), 'a');
+  t.deepEqual(unescapePath('a~0b'), 'a.b');
+  t.deepEqual(unescapePath('a~1b'), 'a~b');
+});
+
+test('parsePath', t => {
+  for (const pathStr of Object.keys(testPath)) {
+    const pathArray = testPath[pathStr];
+    t.deepEqual(parsePath(pathStr), pathArray);
+  }
+  t.throws(() => parsePath(null));
+});
+
+test('stringifyPath', t => {
+  for (const pathStr of Object.keys(testPath)) {
+    const pathArray = testPath[pathStr];
+    t.deepEqual(stringifyPath(pathArray), pathStr);
+  }
+  t.throws(() => stringifyPath(null));
+});
+
+test('parsePath and stringifyPath', t => {
+  for (const pathStr of Object.keys(testPath)) {
+    const pathArray = testPath[pathStr];
+    t.deepEqual(parsePath(stringifyPath(pathArray)), pathArray);
+    t.deepEqual(stringifyPath(stringifyPath(pathStr)), pathStr);
+  }
 });
 
 test('isNullOrUndefined', t => {
@@ -135,4 +175,13 @@ test('arrayFromAllowNullOrUndefined works', t => {
   t.deepEqual(arrayFromAllowNullOrUndefined(undefined), []);
   t.deepEqual(arrayFromAllowNullOrUndefined(0), []);
   t.deepEqual(arrayFromAllowNullOrUndefined({}), []);
+});
+
+test('removeFirstFromArray', t => {
+  const array = [1, 2, 3, 4, 5];
+  removeFirstFromArray(array, 3);
+  t.deepEqual(array, [1, 2, 4, 5]);
+  // remove non-existing value
+  removeFirstFromArray(array, 0);
+  t.deepEqual(array, [1, 2, 4, 5]);
 });

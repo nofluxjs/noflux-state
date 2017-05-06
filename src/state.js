@@ -1,18 +1,16 @@
-import { EventEmitter2 } from 'eventemitter2';
 import Store from './store';
-import { normalizePath, arrayFromAllowNullOrUndefined } from './utils';
+import ListenerTree from './listener-tree';
+import {
+  parsePath,
+  arrayFromAllowNullOrUndefined,
+} from './utils';
 
 export default class State {
 
   constructor({
     store = new Store(),
     cursor = [],
-    emitter = new EventEmitter2({
-      wildcard: true,
-      delimiter: '.',
-      // FIXME: is it good?
-      maxListeners: Infinity,
-    }),
+    emitter = new ListenerTree(),
   } = {}) {
     this.__store = store;
     this.__cursor = cursor;
@@ -22,7 +20,7 @@ export default class State {
   // basic operators
   cursor(subPath = []) {
     const { __store, __cursor, __emitter } = this;
-    subPath = normalizePath(subPath);
+    subPath = parsePath(subPath);
     return new State({
       store: __store,
       cursor: __cursor.concat(subPath),
@@ -50,7 +48,7 @@ export default class State {
       return this.cursor(subPath).set(value);
     }
     this.__store.write(this.__cursor, value);
-    this.__emitter.emit(['change', ...this.__cursor, '**'], {
+    this.__emitter.emit(this.__cursor, {
       path: this.__cursor.join('.'),
       value,
     });
@@ -60,19 +58,15 @@ export default class State {
   __generateEventMessage(message) {
     switch (message) {
       case 'change':
-        return ['change', ...this.__cursor, '**'];
+        return this.__cursor;
       default:
-        return message;
+        throw new Error('only change event allow');
     }
   }
 
   on(message, callback) {
     const generatedMessage = this.__generateEventMessage(message);
-    this.__emitter.on(generatedMessage, callback);
-    // return cleanup handler
-    return () => {
-      this.__emitter.off(generatedMessage, callback);
-    };
+    return this.__emitter.on(generatedMessage, callback);
   }
 
   addEventListener(message, callback) {
@@ -85,7 +79,7 @@ export default class State {
   }
 
   removeEventListener(message, callback) {
-    return this.off(message, callback);
+    this.off(message, callback);
   }
 
   // snapshot support

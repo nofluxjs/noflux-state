@@ -120,13 +120,13 @@ test('maxSnapshots', t => {
     data: 0,
     maxSnapshots: MAX_SNAPSHOTS,
   });
-  for (let i = 1; i <= MAX_SNAPSHOTS; i++) {
+  for (let i = 1; i <= MAX_SNAPSHOTS; i += 1) {
     store.write([], i);
     store.snapshot();
   }
   store.write([], MAX_SNAPSHOTS + 1);
   store.snapshot();
-  for (let i = MAX_SNAPSHOTS; i >= 1; i--) {
+  for (let i = MAX_SNAPSHOTS; i >= 1; i -= 1) {
     store.undo();
     t.is(store.read([]), i);
   }

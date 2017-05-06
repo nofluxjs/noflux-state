@@ -1,8 +1,36 @@
-export const normalizePath = path => {
+export const SYMBOL_NOFLUX = '__noflux';
+
+/*
+ * JSON Pointer style escape
+ * http://tools.ietf.org/html/rfc6901
+ */
+export const escapePath = path => path.replace(/~/g, '~1').replace(/\./g, '~0');
+export const unescapePath = path => path.replace(/~0/g, '.').replace(/~1/g, '~');
+
+export const parsePath = path => {
   if (Array.isArray(path)) {
     return path;
-  } else if (typeof path === 'string') {
-    return path.split('.').filter(subPath => subPath.length);
+  }
+  if (typeof path === 'string') {
+    if (!path.length) {
+      return [];
+    }
+    // path with dot, e.g. 'a~1b.c' => ['a.b', 'c']
+    if (path.indexOf('~') !== -1) {
+      return path.split('.').map(unescapePath);
+    }
+    return path.split('.');
+  }
+  throw Error(`State.prototype.cursor only accept string or array, ${typeof path} is forbidden`);
+};
+
+export const stringifyPath = path => {
+  if (typeof path === 'string') {
+    return path;
+  }
+  if (Array.isArray(path)) {
+    // path with dot, e.g. ['a.b', 'c'] => 'a~1b.c'
+    return path.map(escapePath).join('.');
   }
   throw Error(`State.prototype.cursor only accept string or array, ${typeof path} is forbidden`);
 };
@@ -11,7 +39,7 @@ export const isNullOrUndefined = obj => obj === undefined || obj === null;
 
 export const getByPath = (obj, path) => {
   let pointer = obj;
-  for (let i = 0; i < path.length; i++) {
+  for (let i = 0; i < path.length; i += 1) {
     const next = path[i];
     // only null and undefined has no properties
     // ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Errors/No_properties
@@ -50,7 +78,7 @@ export const setByPath = (obj, path = [], value) => {
   let parentPointer = root;
   let lastNext = HEAD;
   let pointer = obj;
-  for (let i = 0; i < path.length; i++) {
+  for (let i = 0; i < path.length; i += 1) {
     const next = path[i];
     parentPointer[lastNext] = shallowClone(pointer, next);
     parentPointer = parentPointer[lastNext];
@@ -71,3 +99,21 @@ export const setByPath = (obj, path = [], value) => {
 export const arrayFromAllowNullOrUndefined = arrayLike => (
   isNullOrUndefined(arrayLike) ? [] : [...arrayLike]
 );
+
+let count = 1;
+export const getNextId = () => {
+  count += 1;
+  return count;
+};
+
+export const removeFirstFromArray = (array, value) => {
+  const pos = array.indexOf(value);
+  if (pos !== -1) {
+    // about 1.5x faster than the two-arg version of Array#splice() as nodejs said
+    // https://github.com/nodejs/node/blob/v6.x/lib/events.js#L470-L475
+    for (let i = pos, k = i + 1, n = array.length; k < n; i += 1, k += 1) {
+      array[i] = array[k];
+    }
+    array.pop();
+  }
+};
