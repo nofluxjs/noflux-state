@@ -2,6 +2,7 @@ import Store from './store';
 import ListenerTree from './listener-tree';
 import {
   parsePath,
+  stringifyPath,
   arrayFromAllowNullOrUndefined,
 } from './utils';
 
@@ -48,8 +49,8 @@ export default class State {
       return this.cursor(subPath).set(value);
     }
     this.__store.write(this.__cursor, value);
-    this.__emitter.emit(this.__cursor, {
-      path: this.__cursor.join('.'),
+    this.__emitter.emit(this.__generateEventMessage('change'), {
+      path: stringifyPath(this.__cursor),
       value,
     });
   }
