@@ -48,7 +48,7 @@ test('cursor set', t => {
 test.cb('event listen and cancel', t => {
   t.plan(4);
   const state = new State();
-  const handler = state.on('change', () => t.pass());
+  const handler = state.on('set', () => t.pass());
   // should emit
   state.set('', 1);
   state.set('a', 1);
@@ -66,14 +66,14 @@ test.cb('event listen and off', t => {
   t.plan(4);
   const state = new State();
   const callback = () => t.pass();
-  state.on('change', callback);
+  state.on('set', callback);
   // should emit
   state.set('', 1);
   state.set('a', 1);
   state.set('a.b', 1);
   state.set('c.d', 1);
   // remove listener
-  state.off('change', callback);
+  state.off('set', callback);
   state.set('', 1);
   setTimeout(() => {
     t.end();
@@ -83,7 +83,7 @@ test.cb('event listen and off', t => {
 test.cb('event emit with cursor', t => {
   t.plan(4);
   const state = new State();
-  state.cursor('a').on('change', () => t.pass());
+  state.cursor('a').on('set', () => t.pass());
   // should emit
   state.set('', 1);
   state.set('a', 1);
@@ -99,7 +99,7 @@ test.cb('event emit with cursor', t => {
 test.cb('set path with dot', t => {
   t.plan(5);
   const state = new State();
-  state.cursor('a').on('change', () => t.pass());
+  state.cursor('a').on('set', () => t.pass());
   // should emit
   state.set('', 1);
   state.set('a', 1);
@@ -117,7 +117,7 @@ test.cb('set path with dot', t => {
 test.cb('listen path with dot', t => {
   t.plan(3);
   const state = new State();
-  state.cursor(['a.b']).on('change', () => t.pass());
+  state.cursor(['a.b']).on('set', () => t.pass());
   // should emit
   state.set('', 1);
   state.set(['a.b'], 1);
@@ -125,6 +125,21 @@ test.cb('listen path with dot', t => {
   // should not emit
   state.set('a', 1);
   state.set('a.b', 1);
+  setTimeout(() => {
+    t.end();
+  }, TEST_TIMEOUT);
+});
+
+test.cb('get event works', t => {
+  t.plan(4);
+  const state = new State();
+  state.on('get', () => t.pass());
+  state.set('a.b', 1);
+  // will emit
+  state.get('');
+  state.get('a');
+  state.get('a.b');
+  state.get('a.c');
   setTimeout(() => {
     t.end();
   }, TEST_TIMEOUT);
