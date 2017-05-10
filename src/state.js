@@ -6,26 +6,40 @@ import {
   arrayFromAllowNullOrUndefined,
 } from './utils';
 
+const generateEmitterName = message => {
+  if (message === 'get') {
+    return 'get';
+  }
+  // compatible legacy event
+  if (message === 'set' || message === 'change') {
+    return 'set';
+  }
+  throw new Error('event not allowed');
+};
+
 export default class State {
 
   constructor({
     store = new Store(),
     cursor = [],
-    emitter = new ListenerTree(),
+    emitters = {
+      get: new ListenerTree(),
+      set: new ListenerTree(),
+    },
   } = {}) {
     this.__store = store;
     this.__cursor = cursor;
-    this.__emitter = emitter;
+    this.__emitters = emitters;
   }
 
   // basic operators
   cursor(subPath = []) {
-    const { __store, __cursor, __emitter } = this;
+    const { __store, __cursor, __emitters } = this;
     subPath = parsePath(subPath);
     return new State({
       store: __store,
       cursor: __cursor.concat(subPath),
-      emitter: __emitter,
+      emitters: __emitters,
     });
   }
 
@@ -34,7 +48,12 @@ export default class State {
     if (length !== 0) {
       return this.cursor(subPath).get();
     }
-    return this.__store.read(this.__cursor);
+    const value = this.__store.read(this.__cursor);
+    this.__emitters.get.emit(this.__cursor, {
+      path: stringifyPath(this.__cursor),
+      value,
+    });
+    return value;
   }
 
   set(subPath, value) {
@@ -49,25 +68,15 @@ export default class State {
       return this.cursor(subPath).set(value);
     }
     this.__store.write(this.__cursor, value);
-    this.__emitter.emit(this.__generateEventMessage('change'), {
+    this.__emitters.set.emit(this.__cursor, {
       path: stringifyPath(this.__cursor),
       value,
     });
   }
 
-  // tree event emitter
-  __generateEventMessage(message) {
-    switch (message) {
-      case 'change':
-        return this.__cursor;
-      default:
-        throw new Error('only change event allow');
-    }
-  }
-
   on(message, callback) {
-    const generatedMessage = this.__generateEventMessage(message);
-    return this.__emitter.on(generatedMessage, callback);
+    const emitterName = generateEmitterName(message);
+    return this.__emitters[emitterName].on(this.__cursor, callback);
   }
 
   addEventListener(message, callback) {
@@ -75,8 +84,8 @@ export default class State {
   }
 
   off(message, callback) {
-    const generatedMessage = this.__generateEventMessage(message);
-    this.__emitter.off(generatedMessage, callback);
+    const emitterName = generateEmitterName(message);
+    this.__emitters[emitterName].off(this.__cursor, callback);
   }
 
   removeEventListener(message, callback) {
