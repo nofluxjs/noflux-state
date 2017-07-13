@@ -94,7 +94,7 @@ export default class State {
 
   // snapshot support
   snapshot() {
-    return this.__store.snapshot();
+    this.__store.snapshot();
   }
 
   canUndo() {
@@ -102,7 +102,12 @@ export default class State {
   }
 
   undo() {
-    return this.__store.undo();
+    this.__store.undo();
+    // snapshot always emit root event
+    this.__emitters.set.emit([], {
+      path: stringifyPath([]),
+      value: this.__store.read([]),
+    });
   }
 
   canRedo() {
@@ -110,7 +115,12 @@ export default class State {
   }
 
   redo() {
-    return this.__store.redo();
+    this.__store.redo();
+    // snapshot always emit root event
+    this.__emitters.set.emit([], {
+      path: stringifyPath([]),
+      value: this.__store.read([]),
+    });
   }
 
   // immutable Array operators

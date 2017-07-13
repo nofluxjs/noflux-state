@@ -174,6 +174,25 @@ test('snapshot data', t => {
   t.is(state.canRedo(), false);
 });
 
+test.cb('undo & redo should emit set event', t => {
+  t.plan(2);
+  const state = new State();
+
+  state.set('a.b.c', 1);
+  state.snapshot();
+  state.set('a.e.d', 2);
+  state.snapshot();
+  state.set('a.f.g', 3);
+
+  state.on('set', () => t.pass());
+  state.undo();
+  state.redo();
+
+  setTimeout(() => {
+    t.end();
+  }, TEST_TIMEOUT);
+});
+
 test('Array operators worked', t => {
   const state = new State();
   state.set({
