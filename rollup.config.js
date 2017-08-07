@@ -44,7 +44,7 @@ if (isProd) {
       output: {
         comments: (node, { value, type }) => type === "comment2" && /@preserve|@license|@cc_on/i.test(value),
       },
-    }),
+    })
   );
 }
 
