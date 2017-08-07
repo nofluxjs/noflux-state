@@ -14,7 +14,7 @@ const banner =`/*
  * Released under the MIT License.
  */`;
 
-const config =  {
+const config = {
   entry: 'src/index.js',
   format: target,
   moduleName: 'NofluxState',
@@ -42,7 +42,7 @@ if (isProd) {
   config.plugins.push(
     uglify({
       output: {
-        comments: (node, { value, type }) => type === "comment2" && /@preserve|@license|@cc_on/i.test(value),
+        comments: (node, comment) => comment.type === "comment2" && /@preserve|@license|@cc_on/i.test(comment.value),
       },
     })
   );
