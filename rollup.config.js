@@ -4,7 +4,7 @@ import replace from 'rollup-plugin-replace';
 import uglify from 'rollup-plugin-uglify';
 import { version } from './package.json';
 
-const target = process.env.TARGET || 'esm';
+const target = process.env.TARGET || 'es';
 const env = process.env.NODE_ENV || 'development';
 const isProd = env === 'production';
 const banner =`/*
