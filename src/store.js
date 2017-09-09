@@ -1,7 +1,6 @@
 import { getByPath, setByPath } from './utils';
 
 export default class Store {
-
   constructor({
     data,
     // FIXME: export api for changing this value
