@@ -18,7 +18,6 @@ const generateEmitterName = message => {
 };
 
 export default class State {
-
   constructor({
     store = new Store(),
     cursor = [],

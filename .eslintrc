@@ -12,6 +12,7 @@
     "no-param-reassign": ["off"],
     "no-restricted-syntax": ["off"],
     "no-underscore-dangle": ["off", { "allowAfterThis": true, "allowAfterSuper": true }],
+    "no-restricted-globals": ["off"],
     "guard-for-in": ["off"],
     "import/no-extraneous-dependencies": ["error", {
       "devDependencies": [
