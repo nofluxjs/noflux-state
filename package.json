@@ -5,6 +5,7 @@
   "main": "dist/noflux-state.cjs.js",
   "module": "dist/noflux-state.es.js",
   "unpkg": "dist/noflux-state.umd.js",
+  "types": "index.d.ts",
   "scripts": {
     "prepublish": "npm run build",
     "lint": "eslint src/ test/ benchmark/",
