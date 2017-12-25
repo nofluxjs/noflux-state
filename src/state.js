@@ -73,6 +73,21 @@ export default class State {
     });
   }
 
+  update(subPath, callback) {
+    const { length } = arguments;
+    if (length < 1) {
+      throw new TypeError('callback argument must be set');
+    }
+    if (length === 1) {
+      [subPath, callback] = [undefined, subPath];
+    }
+    if (typeof callback !== 'function') {
+      throw new TypeError('callback argument must be a function');
+    }
+    const s = subPath === undefined ? this : this.cursor(subPath);
+    s.set(callback(s.get()));
+  }
+
   on(message, callback) {
     const emitterName = generateEmitterName(message);
     return this.__emitters[emitterName].on(this.__cursor, callback);

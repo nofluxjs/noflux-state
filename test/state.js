@@ -15,6 +15,22 @@ test('get and set', t => {
   t.deepEqual(state.get('a.b.c.d'), 1);
 });
 
+test('update', t => {
+  const state = new State();
+  state.set({ a: { b: 1, c: 2 }, d: [{ e: 3 }, 4] });
+
+  // Object
+  state.update('a', obj => ({
+    ...obj,
+    f: 5,
+  }));
+  t.deepEqual(state.get(), { a: { b: 1, c: 2, f: 5 }, d: [{ e: 3 }, 4] });
+
+  // Array
+  state.update('d', arr => [6, ...arr, {}]);
+  t.deepEqual(state.get(), { a: { b: 1, c: 2, f: 5 }, d: [6, { e: 3 }, 4, {}] });
+});
+
 test('undefined', t => {
   const state = new State();
   t.is(state.get(), undefined);
