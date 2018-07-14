@@ -56,7 +56,7 @@ export default class State {
     if (subPath !== undefined) {
       return this.cursor(subPath).set(value);
     }
-    const changed = this.__store.read(this.__cursor) !== value;
+    const changed = !Object.is(this.__store.read(this.__cursor), value);
     this.__store.write(this.__cursor, value);
     this.__emitters.set.emit(this.__cursor, {
       path: stringifyPath(this.__cursor),
