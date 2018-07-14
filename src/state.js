@@ -6,17 +6,6 @@ import {
   arrayFromAllowNullOrUndefined,
 } from './utils';
 
-const generateEmitterName = message => {
-  if (message === 'get') {
-    return 'get';
-  }
-  // compatible legacy event
-  if (message === 'set' || message === 'change') {
-    return 'set';
-  }
-  throw new Error('event not allowed');
-};
-
 export default class State {
   constructor({
     store = new Store(),
@@ -24,6 +13,7 @@ export default class State {
     emitters = {
       get: new ListenerTree(),
       set: new ListenerTree(),
+      change: new ListenerTree(),
     },
   } = {}) {
     this.__store = store;
@@ -66,11 +56,18 @@ export default class State {
     if (subPath !== undefined) {
       return this.cursor(subPath).set(value);
     }
+    const changed = this.__store.read(this.__cursor) !== value;
     this.__store.write(this.__cursor, value);
     this.__emitters.set.emit(this.__cursor, {
       path: stringifyPath(this.__cursor),
       value,
     });
+    if (changed) {
+      this.__emitters.change.emit(this.__cursor, {
+        path: stringifyPath(this.__cursor),
+        value,
+      });
+    }
   }
 
   update(subPath, callback) {
@@ -88,9 +85,15 @@ export default class State {
     s.set(callback(s.get()));
   }
 
+  __getEmitterByName(message) {
+    if (!this.__emitters[message]) {
+      throw new Error('event not allowed');
+    }
+    return this.__emitters[message];
+  }
+
   on(message, callback) {
-    const emitterName = generateEmitterName(message);
-    return this.__emitters[emitterName].on(this.__cursor, callback);
+    return this.__getEmitterByName(message).on(this.__cursor, callback);
   }
 
   addEventListener(message, callback) {
@@ -98,8 +101,7 @@ export default class State {
   }
 
   off(message, callback) {
-    const emitterName = generateEmitterName(message);
-    this.__emitters[emitterName].off(this.__cursor, callback);
+    this.__getEmitterByName(message).off(this.__cursor, callback);
   }
 
   removeEventListener(message, callback) {

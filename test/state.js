@@ -161,6 +161,28 @@ test.cb('get event works', t => {
   }, TEST_TIMEOUT);
 });
 
+test.cb('change not emitted for same value', t => {
+  t.plan(0);
+  const state = new State();
+  const sameObject = {};
+  state.set({
+    object: sameObject,
+  });
+  state.on('change', () => t.pass());
+  state.set('object', sameObject);
+  setTimeout(() => {
+    t.end();
+  }, TEST_TIMEOUT);
+});
+
+test('invalid event name should throw', t => {
+  const noop = () => { };
+  const state = new State();
+  t.throws(() => state.on('invalid_event_name', noop));
+  t.throws(() => state.on(null, noop));
+  t.throws(() => state.on('update', noop)); // legacy event in noflux
+});
+
 test('snapshot data', t => {
   const state = new State();
 
