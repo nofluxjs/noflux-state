@@ -13,7 +13,6 @@ export default class State {
     emitters = {
       get: new ListenerTree(),
       set: new ListenerTree(),
-      change: new ListenerTree(),
     },
   } = {}) {
     this.__store = store;
@@ -21,7 +20,6 @@ export default class State {
     this.__emitters = emitters;
   }
 
-  // basic operators
   cursor(subPath = []) {
     const { __store, __cursor, __emitters } = this;
     subPath = parsePath(subPath);
@@ -56,18 +54,11 @@ export default class State {
     if (subPath !== undefined) {
       return this.cursor(subPath).set(value);
     }
-    const changed = !Object.is(this.__store.read(this.__cursor), value);
     this.__store.write(this.__cursor, value);
     this.__emitters.set.emit(this.__cursor, {
       path: stringifyPath(this.__cursor),
       value,
     });
-    if (changed) {
-      this.__emitters.change.emit(this.__cursor, {
-        path: stringifyPath(this.__cursor),
-        value,
-      });
-    }
   }
 
   update(subPath, callback) {
