@@ -1,5 +1,9 @@
 # Change Log
 
+## [v1.0.0](https://github.com/nofluxjs/noflux-state/tree/v1.0.0) (2018-08-17)
+
+- v1 released [\#21](https://github.com/nofluxjs/noflux-state/pull/21) ([malash](https://github.com/malash))
+
 ## [v0.7.0](https://github.com/nofluxjs/noflux-state/tree/v0.7.0) (2017-12-27)
 
 - Add `update` method with callback function [\#20](https://github.com/nofluxjs/noflux-state/pull/20) ([malash](https://github.com/malash))
