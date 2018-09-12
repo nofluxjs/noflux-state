@@ -30,7 +30,9 @@ export const getListenerId = (listener, autoGenerate = false) => {
  */
 export class ListenerTreeNode {
   children = {};
+
   subtreeListeners = [];
+
   ownListeners = [];
 }
 

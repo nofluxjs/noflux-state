@@ -97,7 +97,7 @@ export const setByPath = (obj, path = [], value) => {
 // null or undefined will cause an error
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from
 export const arrayFromAllowNullOrUndefined = arrayLike => (
-  isNullOrUndefined(arrayLike) ? [] : [...arrayLike]
+  isNullOrUndefined(arrayLike) ? [] : Array.from(arrayLike)
 );
 
 let count = 1;
